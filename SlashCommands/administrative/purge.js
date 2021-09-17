@@ -1,7 +1,7 @@
 const { Client, CommandInteraction } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const command = {
+module.exports = {
     ...new SlashCommandBuilder()
         .setName('purge')
         .setDescription('Delete messages that not older than 14 days')
@@ -30,7 +30,9 @@ const command = {
 
         let messages = null;
         if (!amount) {
-            messages = interaction.channel.messages.cache.filter(filterMessage);
+            messages = await interaction.channel.messages
+                .fetch({ limit: amount })
+                .then((messages) => messages.filter(filterMessage));
             amount = 0;
         } else if (amount < 100) {
             messages = await interaction.channel.messages
@@ -54,7 +56,3 @@ const command = {
         }
     },
 };
-
-// console.log(command);
-
-module.exports = command;
