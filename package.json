@@ -21,7 +21,8 @@
         "mongoose": "^6.0.2",
         "opusscript": "^0.0.8",
         "youtube-dl-exec": "^1.2.6",
-        "ytdl-core": "^4.9.1"
+        "ytdl-core": "^4.9.1",
+        "ytpl": "^2.2.3"
     },
     "devDependencies": {
         "eslint": "^7.32.0",

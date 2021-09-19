@@ -10,13 +10,12 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply().catch(() => {});
+        await interaction.deferReply({ ephemeral: true });
         // Print out the current queue, including up to the next 5 tracks to be played.
         let subscription = client.subscriptions.get(interaction.guildId);
         if (!subscription) {
-            return await interaction.reply({
+            return await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
-                ephemeral: true,
             });
         }
 
@@ -30,13 +29,13 @@ module.exports = {
                 subscription.queue
                     .slice(startIdx, endIdx)
                     .map((track, index) => {
-                        const no = `${index + 1}`.padStart(2, 0);
-                        const title = `「${no}」 ${track.title.substr(0, 50)}${
-                            track.title.length > 50 ? '...' : ''
+                        const no = `${startIdx + index + 1}`.padStart(2, 0);
+                        const title = `「${no}」 ${track.title.substr(0, 45)}${
+                            track.title.length > 45 ? '...' : ''
                         }`;
-                        if (index + 1 === subscription.current) {
+                        if (startIdx + index + 1 === subscription.current) {
                             return `${title}\n      ⬐ current track`;
-                        } else if (index - 1 === subscription.current) {
+                        } else if (startIdx + index - 1 === subscription.current) {
                             return `      ⬑ current track\n${title}`;
                         }
                         return `${title}`;
@@ -50,9 +49,14 @@ module.exports = {
                     .setCustomId('prev')
                     .setLabel('Previous Page')
                     .setStyle('PRIMARY')
+                    .setDisabled(true)
             )
             .addComponents(
-                new MessageButton().setCustomId('next').setLabel('Next Page').setStyle('PRIMARY')
+                new MessageButton()
+                    .setCustomId('next')
+                    .setLabel('Next Page')
+                    .setStyle('PRIMARY')
+                    .setDisabled(maxPage > 1 ? false : true)
             );
 
         const master = await interaction.followUp({
@@ -68,28 +72,45 @@ module.exports = {
         });
 
         collector.on('collect', async (buttonInteract) => {
-            const beforeChange = page;
             if (buttonInteract.customId === 'next') {
-                page += page + 1 < maxPage ? 1 : 0;
+                // page += page + 1 < maxPage ? 1 : 0;
+                page++;
             } else if (buttonInteract.customId === 'prev') {
-                page -= page - 1 >= 0 ? 1 : 0;
+                // page -= page - 1 >= 0 ? 1 : 0;
+                page--;
             }
 
-            if (beforeChange != page) {
-                await buttonInteract.update({
-                    content: `\`\`\`\n${queue[page]}\n\`\`\``,
-                    components: [button],
-                });
-            } else {
-                await buttonInteract.reply({ content: 'This is the last page', ephemeral: true });
-            }
+            await buttonInteract.update({
+                content: `\`\`\`\n${queue[page]}\n\`\`\``,
+                components: [
+                    new MessageActionRow()
+                        .addComponents(
+                            new MessageButton()
+                                .setCustomId('prev')
+                                .setLabel('Previous Page')
+                                .setStyle('PRIMARY')
+                                .setDisabled(page === 0)
+                        )
+                        .addComponents(
+                            new MessageButton()
+                                .setCustomId('next')
+                                .setLabel('Next Page')
+                                .setStyle('PRIMARY')
+                                .setDisabled(page === maxPage - 1 ? true : false)
+                        ),
+                ],
+            });
         });
 
         collector.on('end', async () => {
-            await master.edit({
-                content: `\`\`\`\n${queue[page]}\n\`\`\``,
-                components: [],
-            });
+            try {
+                await master.edit({
+                    content: `\`\`\`\n${queue[page]}\n\`\`\``,
+                    components: [],
+                });
+            } catch (err) {
+                console.log('The message already dismissed');
+            }
         });
     },
 };

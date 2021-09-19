@@ -151,6 +151,19 @@ class MusicSubscription {
     }
 
     /**
+     * Adds a new Track to the queue.
+     *
+     * @param {Track[]} trackList The track to add to the queue
+     */
+    enqueueList(trackList) {
+        trackList.forEach((track) => {
+            track.position = this.size++;
+            this.queue.push(track);
+        });
+        void this.processQueue();
+    }
+
+    /**
      * Stops audio playback and empties the queue
      */
     stop() {
@@ -189,6 +202,7 @@ class MusicSubscription {
         this.queueLock = true;
         try {
             // Attempt to convert the Track into an AudioResource (i.e. start streaming the video)
+            // console.log(trackToPlay);
             const resource = await trackToPlay.createAudioResource();
             this.audioPlayer.play(resource);
             this.queueLock = false;

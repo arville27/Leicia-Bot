@@ -46,9 +46,8 @@ module.exports = async (client) => {
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
         const ids = Object.values(guildsId);
-        let i = 0;
-        const tks = client.guilds.cache.get('425654507607687178');
-        await tks.commands.set([]);
+        // const tks = client.guilds.cache.get('425654507607687178');
+        // await tks.commands.set([]);
         ids.forEach(async (guildId) => {
             if (!guildId) return;
             const guild = client.guilds.cache.get(guildId);

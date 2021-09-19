@@ -9,7 +9,10 @@ module.exports = {
         .setName('play')
         .setDescription('Plays a song from YouTube')
         .addStringOption((option) =>
-            option.setName('song').setDescription('The URL of the song to play').setRequired(true)
+            option
+                .setName('song')
+                .setDescription('The URL of the song/playlist to play')
+                .setRequired(true)
         ),
     /**
      *
@@ -18,7 +21,7 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply().catch(() => {});
+        await interaction.deferReply();
         let subscription = client.subscriptions.get(interaction.guildId);
         const url = interaction.options.getString('song');
 
@@ -69,69 +72,94 @@ module.exports = {
         }
 
         try {
-            // Attempt to create a Track from the user's video URL
-            const track = await Track.from(url, {
-                onStart() {
-                    const trackInfo = new MessageEmbed()
-                        .setColor('#00eb55')
-                        .setTitle(track.title)
-                        .setURL(track.url)
-                        .setAuthor('Now playing', interaction.user.avatarURL())
-                        .setThumbnail(track.thumbnail)
-                        .addFields(
-                            {
-                                name: 'Song Duration',
-                                value: track.getTrackDuration(),
-                                inline: true,
-                            },
-                            {
-                                name: 'Queue Position',
-                                value: `Track ${track.position}`,
-                                inline: true,
-                            }
-                        )
-                        .setTimestamp();
-                    interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
-                },
-                onFinish() {
-                    return interaction.followUp({
-                        embeds: [
-                            new MessageEmbed()
-                                .setDescription(':musical_note: **Queue finished**')
-                                .setColor('#eb0000'),
-                        ],
-                    });
-                },
-                onError(error) {
-                    console.warn(error);
-                    interaction
-                        .followUp({ content: `Error: ${error.message}`, ephemeral: true })
-                        .catch(console.warn);
-                },
-            });
-
-            // Enqueue the track and reply a success message to the user
-            subscription.enqueue(track);
-
-            const mediaInfo = new MessageEmbed()
-                .setColor('#c99fff')
-                .setTitle(track.title)
-                .setURL(track.url)
-                .setAuthor('Added to queue', interaction.user.avatarURL())
-                .setThumbnail(track.thumbnail)
-                .addFields(
-                    {
-                        name: 'Song Duration',
-                        value: track.getTrackDuration(),
-                        inline: true,
+            let mediaInfo = null;
+            if (Track.isPlaylist(url)) {
+                const { playlistInfo, trackList } = await Track.makeTrackList(url, {
+                    onFinish() {
+                        return interaction.followUp({
+                            embeds: [
+                                new MessageEmbed()
+                                    .setDescription(':musical_note: **Queue finished**')
+                                    .setColor('#eb0000'),
+                            ],
+                        });
                     },
-                    {
-                        name: 'Queue Position',
-                        value: `Track ${track.position}`,
-                        inline: true,
-                    }
-                )
-                .setTimestamp();
+                    onError(error) {
+                        console.warn(error);
+                        interaction
+                            .followUp({ content: `Error: ${error.message}`, ephemeral: true })
+                            .catch(console.warn);
+                    },
+                });
+
+                trackList.forEach((track) => {
+                    track.setOnStart(() => {
+                        const trackInfo = Track.generateTrackEmbed(track, interaction);
+                        interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
+                    });
+                });
+
+                // trackList.forEach((track) => subscription.enqueue(track));
+                subscription.enqueueList(trackList);
+
+                // Media info
+                mediaInfo = new MessageEmbed()
+                    .setColor('#c99fff')
+                    .setTitle(playlistInfo.playlistName)
+                    .setAuthor('Playlist added to queue', interaction.user.avatarURL())
+                    .setThumbnail(playlistInfo.thumbnail)
+                    .addFields({
+                        name: 'Added to queue',
+                        value: `${playlistInfo.count}`,
+                    })
+                    .setTimestamp();
+            } else {
+                // Attempt to create a Track from the user's video URL
+                const track = await Track.from(url, {
+                    onStart() {
+                        const trackInfo = Track.generateTrackEmbed(track, interaction);
+                        interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
+                    },
+                    onFinish() {
+                        return interaction.followUp({
+                            embeds: [
+                                new MessageEmbed()
+                                    .setDescription(':musical_note: **Queue finished**')
+                                    .setColor('#eb0000'),
+                            ],
+                        });
+                    },
+                    onError(error) {
+                        console.warn(error);
+                        interaction
+                            .followUp({ content: `Error: ${error.message}`, ephemeral: true })
+                            .catch(console.warn);
+                    },
+                });
+
+                // Enqueue the track and reply a success message to the user
+                subscription.enqueue(track);
+
+                mediaInfo = new MessageEmbed()
+                    .setColor('#c99fff')
+                    .setTitle(track.title)
+                    .setURL(track.url)
+                    .setAuthor('Added to queue', interaction.user.avatarURL())
+                    .setThumbnail(track.thumbnail)
+                    .addFields(
+                        {
+                            name: 'Song Duration',
+                            value: track.getTrackDuration(),
+                            inline: true,
+                        },
+                        {
+                            name: 'Queue Position',
+                            value: `Track ${track.position}`,
+                            inline: true,
+                        }
+                    )
+                    .setTimestamp();
+            }
             await interaction.followUp({ embeds: [mediaInfo] });
         } catch (error) {
             console.warn(error);

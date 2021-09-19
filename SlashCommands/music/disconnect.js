@@ -10,11 +10,12 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
+        await interaction.deferReply({ ephemeral: true });
         let subscription = client.subscriptions.get(interaction.guildId);
         if (subscription) {
             subscription.voiceConnection.destroy();
             client.subscriptions.delete(interaction.guildId);
-            await interaction.reply({
+            await interaction.followUp({
                 embeds: [
                     new MessageEmbed()
                         .setDescription(':small_red_triangle: **Disconnected from channel!**')
@@ -22,7 +23,7 @@ module.exports = {
                 ],
             });
         } else {
-            await interaction.reply({
+            await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
                 ephemeral: true,
             });

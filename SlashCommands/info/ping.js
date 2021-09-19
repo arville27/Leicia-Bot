@@ -10,7 +10,7 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: false }).catch(() => {});
+        await interaction.deferReply();
         await interaction.followUp({
             embeds: [
                 new MessageEmbed().addFields({

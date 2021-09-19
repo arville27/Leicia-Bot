@@ -12,10 +12,11 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
+        await interaction.deferReply({ ephemeral: true });
         let subscription = client.subscriptions.get(interaction.guildId);
         if (subscription) {
             subscription.audioPlayer.unpause();
-            await interaction.reply({
+            await interaction.followUp({
                 embeds: [
                     new MessageEmbed()
                         .setDescription(':arrow_forward: **Unpaused!**')
@@ -23,7 +24,7 @@ module.exports = {
                 ],
             });
         } else {
-            await interaction.reply({
+            await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
                 ephemeral: true,
             });

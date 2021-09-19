@@ -1,6 +1,8 @@
 const { getInfo } = require('ytdl-core');
-const { AudioResource, createAudioResource, demuxProbe } = require('@discordjs/voice');
+const { createAudioResource, demuxProbe } = require('@discordjs/voice');
 const { raw } = require('youtube-dl-exec');
+const ytpl = require('ytpl');
+const { MessageEmbed, CommandInteraction } = require('discord.js');
 
 const noop = () => {};
 
@@ -111,6 +113,92 @@ class Track {
             length: info.videoDetails.lengthSeconds,
             ...wrappedMethods,
         });
+    }
+
+    /**
+     * Creates a Track from a video URL and lifecycle callback methods.
+     *
+     * @param {Track} track The URL of the video
+     * @param {CommandInteraction} interaction The URL of the video
+     * @returns Discord Message Embed
+     */
+    static generateTrackEmbed(track, interaction) {
+        return new MessageEmbed()
+            .setColor('#00eb55')
+            .setTitle(track.title)
+            .setURL(track.url)
+            .setAuthor('Now playing', interaction.user.avatarURL())
+            .setThumbnail(track.thumbnail)
+            .addFields(
+                {
+                    name: 'Song Duration',
+                    value: track.getTrackDuration(),
+                    inline: true,
+                },
+                {
+                    name: 'Queue Position',
+                    value: `Track ${track.position}`,
+                    inline: true,
+                }
+            )
+            .setTimestamp();
+    }
+
+    setOnStart(fn) {
+        const wrappedMethods = {
+            onStart() {
+                wrappedMethods.onStart = noop;
+                fn();
+            },
+        };
+        this.onStart = wrappedMethods.onStart;
+    }
+
+    /**
+     * Creates a Track from a video URL and lifecycle callback methods.
+     *
+     * @param {String} playlistId The URL of the video
+     * @param methods Lifecycle callbacks
+     * @returns The created List of Track
+     */
+    static async makeTrackList(playlistId, methods) {
+        const rawInfo = await ytpl(playlistId);
+        const playlistInfo = {
+            playlistName: rawInfo.title,
+            count: rawInfo.estimatedItemCount,
+            thumbnail: rawInfo.bestThumbnail.url,
+        };
+        const trackList = rawInfo.items.map((info) => {
+            const wrappedMethods = {
+                onFinish() {
+                    wrappedMethods.onFinish = noop;
+                    methods.onFinish();
+                },
+                onError(error) {
+                    wrappedMethods.onError = noop;
+                    methods.onError(error);
+                },
+            };
+
+            const track = new Track({
+                title: info.title,
+                url: info.shortUrl,
+                thumbnail: info.bestThumbnail.url,
+                length: info.durationSec,
+                ...wrappedMethods,
+            });
+
+            return track;
+        });
+
+        return { playlistInfo, trackList };
+    }
+
+    /**
+     * @param {String} url
+     */
+    static isPlaylist(url) {
+        return ytpl.validateID(url);
     }
 }
 

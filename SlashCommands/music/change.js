@@ -15,22 +15,22 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
+        await interaction.deferReply({ ephemeral: true });
         let subscription = client.subscriptions.get(interaction.guildId);
         if (subscription) {
             // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
             // listener defined in music/subscription.ts, transitions into the Idle state mean the next track from the queue
             // will be loaded and played.
             const trackNumber = interaction.options.getInteger('no');
-            console.log(subscription.size);
             if (trackNumber >= subscription.size || trackNumber < 1) {
-                return await interaction.reply({
+                return await interaction.followUp({
                     content: ':diamond_shape_with_a_dot_inside:  Please provide a valid number',
                     ephemeral: true,
                 });
             }
 
             subscription.changeTrack(trackNumber);
-            await interaction.reply({
+            await interaction.followUp({
                 embeds: [
                     new MessageEmbed()
                         .setDescription(`:track_next: **Change to track no ${trackNumber}!**`)
@@ -38,7 +38,7 @@ module.exports = {
                 ],
             });
         } else {
-            await interaction.reply({
+            await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
                 ephemeral: true,
             });
