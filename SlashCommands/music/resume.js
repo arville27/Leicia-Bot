@@ -1,4 +1,4 @@
-const { Client, CommandInteraction } = require('discord.js');
+const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
@@ -15,9 +15,18 @@ module.exports = {
         let subscription = client.subscriptions.get(interaction.guildId);
         if (subscription) {
             subscription.audioPlayer.unpause();
-            await interaction.reply({ content: `Unpaused!`, ephemeral: true });
+            await interaction.reply({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(':arrow_forward: **Unpaused!**')
+                        .setColor('#00eb55'),
+                ],
+            });
         } else {
-            await interaction.reply('Not playing in this server!');
+            await interaction.reply({
+                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+                ephemeral: true,
+            });
         }
     },
 };

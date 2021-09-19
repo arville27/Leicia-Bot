@@ -15,17 +15,28 @@ const noop = () => {};
  */
 class Track {
     /**
-     * @typedef {{url: string, title: string, onStart: () => void, onFinish: () => void, onError: (error: Error) => void}} TrackData
+     * @typedef {{url: string, title: string, thumbnail: string, length: int, onStart: () => void, onFinish: () => void, onError: (error: Error) => void}} TrackData
      * @param {TrackData} param
      */
-    constructor({ url, title, onStart, onFinish, onError }) {
+    constructor({ url, title, thumbnail, length, onStart, onFinish, onError }) {
         this.url = url;
+        this.thumbnail = thumbnail;
         this.title = title;
+        this.duration = {
+            hour: `${Math.floor(length / 3600)}`.padStart(2, 0),
+            minute: `${Math.floor((length / 60) % 60)}`.padStart(2, 0),
+            second: `${length % 60}`.padStart(2, 0),
+        };
         this.onStart = onStart;
         this.onFinish = onFinish;
         this.onError = onError;
     }
 
+    getTrackDuration() {
+        if (parseInt(this.duration.hour) > 0)
+            return `${this.duration.hour}:${this.duration.minute}:${this.duration.second}`;
+        return `${this.duration.minute}:${this.duration.second}`;
+    }
     /**
      * Creates an AudioResource from this Track.
      */
@@ -95,7 +106,9 @@ class Track {
 
         return new Track({
             title: info.videoDetails.title,
-            url,
+            url: url,
+            thumbnail: info.videoDetails.thumbnails[0].url,
+            length: info.videoDetails.lengthSeconds,
             ...wrappedMethods,
         });
     }

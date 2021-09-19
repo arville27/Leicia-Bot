@@ -2,7 +2,7 @@ const { glob } = require('glob');
 const { promisify } = require('util');
 const { Client } = require('discord.js');
 const mongoose = require('mongoose');
-const { mongooseConnectionString, guildId } = require('../config.json');
+const { mongooseConnectionString, guildsId } = require('../config.json');
 
 const globPromise = promisify(glob);
 
@@ -45,49 +45,56 @@ module.exports = async (client) => {
         // Register for a single guild
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
-        const guild = client.guilds.cache.get(guildId);
-        await guild.commands.set(arrayOfSlashCommands).then((cmd) => {
-            const getRoles = (commandName) => {
-                const permissions = arrayOfSlashCommands.find(
-                    (x) => commandName === x.name
-                ).userPermissions;
+        const ids = Object.values(guildsId);
+        let i = 0;
+        const tks = client.guilds.cache.get('425654507607687178');
+        await tks.commands.set([]);
+        ids.forEach(async (guildId) => {
+            if (!guildId) return;
+            const guild = client.guilds.cache.get(guildId);
+            await guild.commands.set(arrayOfSlashCommands).then((cmd) => {
+                const getRoles = (commandName) => {
+                    const permissions = arrayOfSlashCommands.find(
+                        (x) => commandName === x.name
+                    ).userPermissions;
 
-                if (!permissions) return null;
+                    if (!permissions) return null;
 
-                const roles = guild.roles.cache.filter(
-                    (x) => x.permissions.has(permissions) && !x.managed
-                );
-                // roles.forEach((role) => {
-                //     console.log(role.name);
-                // });
-                return roles;
-            };
+                    const roles = guild.roles.cache.filter(
+                        (x) => x.permissions.has(permissions) && !x.managed
+                    );
+                    // roles.forEach((role) => {
+                    //     console.log(role.name);
+                    // });
+                    return roles;
+                };
 
-            const fullPermissions = cmd.reduce((accumulator, x) => {
-                const roles = getRoles(x.name);
-                if (!roles) return accumulator;
+                const fullPermissions = cmd.reduce((accumulator, x) => {
+                    const roles = getRoles(x.name);
+                    if (!roles) return accumulator;
 
-                const permissions = roles.reduce((a, v) => {
+                    const permissions = roles.reduce((a, v) => {
+                        return [
+                            ...a,
+                            {
+                                id: v.id,
+                                type: 'ROLE',
+                                permission: true,
+                            },
+                        ];
+                    }, []);
+
                     return [
-                        ...a,
+                        ...accumulator,
                         {
-                            id: v.id,
-                            type: 'ROLE',
-                            permission: true,
+                            id: x.id,
+                            permissions,
                         },
                     ];
                 }, []);
 
-                return [
-                    ...accumulator,
-                    {
-                        id: x.id,
-                        permissions,
-                    },
-                ];
-            }, []);
-
-            guild.commands.permissions.set({ fullPermissions });
+                guild.commands.permissions.set({ fullPermissions });
+            });
         });
     });
 

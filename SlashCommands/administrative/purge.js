@@ -10,7 +10,7 @@ module.exports = {
                 .setName('amount')
                 .setDescription('The amount of message to purge, default 5, max 100')
         )
-        .setDefaultPermission(true),
+        .setDefaultPermission(false),
     userPermissions: ['MANAGE_MESSAGES'],
     /**
      *
@@ -31,7 +31,7 @@ module.exports = {
         let messages = null;
         if (!amount) {
             messages = await interaction.channel.messages
-                .fetch({ limit: amount })
+                .fetch({ limit: 100 })
                 .then((messages) => messages.filter(filterMessage));
             amount = 0;
         } else if (amount < 100) {

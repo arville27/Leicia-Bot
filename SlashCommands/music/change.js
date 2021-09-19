@@ -1,11 +1,13 @@
 const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { AudioPlayerStatus } = require('@discordjs/voice');
 
 module.exports = {
     ...new SlashCommandBuilder()
-        .setName('skip')
-        .setDescription('Skip to the next song in the queue'),
+        .setName('change')
+        .setDescription('Change to any track in the queue')
+        .addIntegerOption((option) =>
+            option.setName('no').setDescription('Track number you want to play').setRequired(true)
+        ),
     /**
      *
      * @param {Client} client
@@ -18,17 +20,20 @@ module.exports = {
             // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
             // listener defined in music/subscription.ts, transitions into the Idle state mean the next track from the queue
             // will be loaded and played.
-            if (subscription.audioPlayer.state.status === AudioPlayerStatus.Idle) {
+            const trackNumber = interaction.options.getInteger('no');
+            console.log(subscription.size);
+            if (trackNumber >= subscription.size || trackNumber < 1) {
                 return await interaction.reply({
-                    content: ':diamond_shape_with_a_dot_inside:  The queue is empty',
+                    content: ':diamond_shape_with_a_dot_inside:  Please provide a valid number',
                     ephemeral: true,
                 });
             }
-            subscription.skip();
+
+            subscription.changeTrack(trackNumber);
             await interaction.reply({
                 embeds: [
                     new MessageEmbed()
-                        .setDescription(':track_next: **Skipped song!**')
+                        .setDescription(`:track_next: **Change to track no ${trackNumber}!**`)
                         .setColor('#0070eb'),
                 ],
             });

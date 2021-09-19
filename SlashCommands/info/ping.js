@@ -1,4 +1,4 @@
-const { Client, CommandInteraction } = require('discord.js');
+const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
@@ -11,6 +11,15 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: false }).catch(() => {});
-        await interaction.editReply({ content: `Pong! (${client.ws.ping} ms)` });
+        await interaction.followUp({
+            embeds: [
+                new MessageEmbed().addFields({
+                    name: '🏓 Pong!',
+                    value: `Latency is ${
+                        Date.now() - interaction.createdTimestamp
+                    } ms\nAPI Latency! (${client.ws.ping} ms)`,
+                }),
+            ],
+        });
     },
 };

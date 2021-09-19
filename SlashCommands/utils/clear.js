@@ -12,7 +12,7 @@ module.exports = {
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: true }).catch(() => {});
         const messages = await interaction.channel.messages
-            .fetch()
+            .fetch({ limit: 100 })
             .then((messages) =>
                 messages.filter(
                     (message) =>

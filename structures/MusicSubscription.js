@@ -10,17 +10,21 @@ const {
 } = require('@discordjs/voice');
 const { Track } = require('./Track');
 const { promisify } = require('util');
+const { StickerPack } = require('discord.js');
 const wait = promisify(setTimeout);
 
 /**
  * A MusicSubscription exists for each active VoiceConnection. Each subscription has its own audio player and queue,
  * and it also attaches logic to the audio player and voice connection for error handling and reconnection logic.
  */
+
 class MusicSubscription {
     /**
      * @param {VoiceConnection} voiceConnection
      */
     constructor(voiceConnection) {
+        this.current = 0;
+        this.size = 1;
         this.queueLock = false;
         this.readyLock = false;
         this.voiceConnection = voiceConnection;
@@ -98,7 +102,8 @@ class MusicSubscription {
             ) {
                 // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                 // The queue is then processed to start playing the next track, if one is available.
-                oldState.resource.metadata.onFinish();
+                this.current++;
+                if (!this.queue.at(this.current)) oldState.resource.metadata.onFinish();
                 void this.processQueue();
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
@@ -111,12 +116,36 @@ class MusicSubscription {
         voiceConnection.subscribe(this.audioPlayer);
     }
 
+    skip() {
+        this.audioPlayer.stop();
+    }
+
+    prev() {
+        if (this.audioPlayer.state.status == AudioPlayerStatus.Idle) {
+            this.current -= 1;
+            this.processQueue();
+        } else {
+            this.current -= 2;
+            this.audioPlayer.stop();
+        }
+    }
+
+    changeTrack(index) {
+        if (this.audioPlayer.state.status == AudioPlayerStatus.Idle) {
+            this.current = index - 1;
+            this.processQueue();
+        } else {
+            this.current = index - 2;
+            this.audioPlayer.stop();
+        }
+    }
     /**
      * Adds a new Track to the queue.
      *
      * @param {Track} track The track to add to the queue
      */
     enqueue(track) {
+        track.position = this.size++;
         this.queue.push(track);
         void this.processQueue();
     }
@@ -125,9 +154,19 @@ class MusicSubscription {
      * Stops audio playback and empties the queue
      */
     stop() {
+        this.current = 0;
+        this.size = 1;
         this.queueLock = true;
         this.queue = [];
         this.audioPlayer.stop(true);
+    }
+
+    setCurrent(current) {
+        this.current = current;
+    }
+
+    getCurrent() {
+        return this.current;
     }
 
     /**
@@ -138,23 +177,24 @@ class MusicSubscription {
         if (
             this.queueLock ||
             this.audioPlayer.state.status !== AudioPlayerStatus.Idle ||
-            this.queue.length === 0
+            !this.queue.at(this.current)
         ) {
             return;
         }
-        // Lock the queue to guarantee safe access
-        this.queueLock = true;
 
         // Take the first item from the queue. This is guaranteed to exist due to the non-empty check above.
-        const nextTrack = this.queue.shift();
+        const trackToPlay = this.queue.at(this.current);
+
+        // Lock the queue to guarantee safe access
+        this.queueLock = true;
         try {
             // Attempt to convert the Track into an AudioResource (i.e. start streaming the video)
-            const resource = await nextTrack.createAudioResource();
+            const resource = await trackToPlay.createAudioResource();
             this.audioPlayer.play(resource);
             this.queueLock = false;
         } catch (error) {
             // If an error occurred, try the next item of the queue instead
-            nextTrack.onError(error);
+            trackToPlay.onError(error);
             this.queueLock = false;
             return this.processQueue();
         }

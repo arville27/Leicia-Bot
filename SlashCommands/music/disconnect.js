@@ -2,9 +2,7 @@ const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-    ...new SlashCommandBuilder()
-        .setName('pause')
-        .setDescription('Pauses the song that is currently playing'),
+    ...new SlashCommandBuilder().setName('dc').setDescription('Disconnect from the voice channel'),
     /**
      *
      * @param {Client} client
@@ -14,9 +12,14 @@ module.exports = {
     run: async (client, interaction, args) => {
         let subscription = client.subscriptions.get(interaction.guildId);
         if (subscription) {
-            subscription.audioPlayer.pause();
+            subscription.voiceConnection.destroy();
+            client.subscriptions.delete(interaction.guildId);
             await interaction.reply({
-                embeds: [new MessageEmbed().setDescription(':pause_button: **Paused!**')],
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(':small_red_triangle: **Disconnected from channel!**')
+                        .setColor('#eb0000'),
+                ],
             });
         } else {
             await interaction.reply({
