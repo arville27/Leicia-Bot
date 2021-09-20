@@ -3,6 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MusicSubscription } = require('../../structures/MusicSubscription');
 const { entersState, joinVoiceChannel, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
+const ytsr = require('ytsr');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -11,7 +12,7 @@ module.exports = {
         .addStringOption((option) =>
             option
                 .setName('song')
-                .setDescription('The URL of the song/playlist to play')
+                .setDescription('This can be a URL of the song/playlist to play or a keyword')
                 .setRequired(true)
         ),
     /**
@@ -21,9 +22,15 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply();
+        if (!interaction.deferred) await interaction.deferReply();
         let subscription = client.subscriptions.get(interaction.guildId);
-        const url = interaction.options.getString('song');
+        let param = args[0];
+        // const url = interaction.options.getString('song') || args[0];
+        if (!param.match(/([a-z]+:\/\/)(?:([a-z0-9]+)\.)?([a-z0-9]+)\.([a-z]{2,})/g)) {
+            // url as query
+            const results = await ytsr(param);
+            param = results.items.find((item) => item.type === 'video').url;
+        }
 
         // If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
         // and create a subscription.
@@ -73,8 +80,8 @@ module.exports = {
 
         try {
             let mediaInfo = null;
-            if (Track.isPlaylist(url)) {
-                const { playlistInfo, trackList } = await Track.makeTrackList(url, {
+            if (Track.isPlaylist(param)) {
+                const { playlistInfo, trackList } = await Track.makeTrackList(param, {
                     onFinish() {
                         const embed = new MessageEmbed()
                             .setDescription(':musical_note: **Queue finished**')
@@ -98,7 +105,6 @@ module.exports = {
                     });
                 });
 
-                // trackList.forEach((track) => subscription.enqueue(track));
                 subscription.enqueueList(trackList);
 
                 // Media info
@@ -114,7 +120,7 @@ module.exports = {
                     .setTimestamp();
             } else {
                 // Attempt to create a Track from the user's video URL
-                const track = await Track.from(url, {
+                const track = await Track.from(param, {
                     onStart() {
                         const trackInfo = Track.generateTrackEmbed(track, interaction);
                         interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
