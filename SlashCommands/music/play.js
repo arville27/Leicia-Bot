@@ -76,12 +76,11 @@ module.exports = {
             if (Track.isPlaylist(url)) {
                 const { playlistInfo, trackList } = await Track.makeTrackList(url, {
                     onFinish() {
+                        const embed = new MessageEmbed()
+                            .setDescription(':musical_note: **Queue finished**')
+                            .setColor('#eb0000');
                         return interaction.followUp({
-                            embeds: [
-                                new MessageEmbed()
-                                    .setDescription(':musical_note: **Queue finished**')
-                                    .setColor('#eb0000'),
-                            ],
+                            embeds: [embed],
                         });
                     },
                     onError(error) {
@@ -121,12 +120,11 @@ module.exports = {
                         interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
                     },
                     onFinish() {
+                        const embed = new MessageEmbed()
+                            .setDescription(':musical_note: **Queue finished**')
+                            .setColor('#eb0000');
                         return interaction.followUp({
-                            embeds: [
-                                new MessageEmbed()
-                                    .setDescription(':musical_note: **Queue finished**')
-                                    .setColor('#eb0000'),
-                            ],
+                            embeds: [embed],
                         });
                     },
                     onError(error) {
