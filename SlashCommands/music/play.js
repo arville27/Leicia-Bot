@@ -32,6 +32,12 @@ module.exports = {
             param = results.items.find((item) => item.type === 'video').url;
         }
 
+        // check if already destroyed but still in the subscriptions map
+        if (subscription && subscription.destroyed) {
+            client.subscriptions.delete(interaction.guildId);
+            subscription = null;
+        }
+
         // If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
         // and create a subscription.
         if (!subscription) {

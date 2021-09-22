@@ -52,7 +52,7 @@ module.exports = {
         const collector = interaction.channel.createMessageComponentCollector({
             filter,
             max: 1,
-            time: 60 * 1000,
+            time: 30 * 1000,
             componentType: 'SELECT_MENU',
         });
 
@@ -62,7 +62,9 @@ module.exports = {
             //     content: ':diamond_shape_with_a_dot_inside: Already selected',
             //     components: [],
             // });
-            await play.run(client, componentInteraction, componentInteraction.values);
+            await play.run(client, componentInteraction, componentInteraction.values).catch(() => {
+                console.log('probably already dismissed');
+            });
         });
     },
 };

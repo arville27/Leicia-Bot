@@ -17,6 +17,13 @@ module.exports = {
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: true });
         let subscription = client.subscriptions.get(interaction.guildId);
+
+        // check if already destroyed but still in the subscriptions map
+        if (subscription && subscription.destroyed) {
+            client.subscriptions.delete(interaction.guildId);
+            subscription = null;
+        }
+
         if (subscription) {
             // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
             // listener defined in music/subscription.ts, transitions into the Idle state mean the next track from the queue

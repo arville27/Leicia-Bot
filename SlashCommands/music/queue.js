@@ -13,6 +13,13 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true });
         // Print out the current queue, including up to the next 5 tracks to be played.
         let subscription = client.subscriptions.get(interaction.guildId);
+
+        // check if already destroyed but still in the subscriptions map
+        if (subscription && subscription.destroyed) {
+            client.subscriptions.delete(interaction.guildId);
+            subscription = null;
+        }
+
         if (!subscription) {
             return await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',

@@ -10,7 +10,6 @@ const {
 } = require('@discordjs/voice');
 const { Track } = require('./Track');
 const { promisify } = require('util');
-const { StickerPack } = require('discord.js');
 const wait = promisify(setTimeout);
 
 /**
@@ -25,6 +24,8 @@ class MusicSubscription {
     constructor(voiceConnection) {
         this.current = 0;
         this.size = 1;
+        this.leave = false;
+        this.destroyed = false;
         this.queueLock = false;
         this.readyLock = false;
         this.voiceConnection = voiceConnection;
@@ -95,7 +96,7 @@ class MusicSubscription {
         });
 
         // Configure audio player
-        this.audioPlayer.on('stateChange', (oldState, newState) => {
+        this.audioPlayer.on('stateChange', async (oldState, newState) => {
             if (
                 newState.status === AudioPlayerStatus.Idle &&
                 oldState.status !== AudioPlayerStatus.Idle
@@ -103,10 +104,23 @@ class MusicSubscription {
                 // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                 // The queue is then processed to start playing the next track, if one is available.
                 this.current++;
-                if (!this.queue.at(this.current)) oldState.resource.metadata.onFinish();
+                if (!this.queue.at(this.current)) {
+                    oldState.resource.metadata.onFinish();
+                    this.leave = true;
+                    this.timeout = await wait(5 * 60_000);
+                    if (this.leave) {
+                        try {
+                            this.voiceConnection.destroy();
+                        } catch (err) {
+                            console.log('Voice connection already destroyed');
+                        }
+                        this.destroyed = true;
+                    }
+                }
                 void this.processQueue();
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
+                this.leave = false;
                 newState.resource.metadata.onStart();
             }
         });
@@ -167,6 +181,7 @@ class MusicSubscription {
      * Stops audio playback and empties the queue
      */
     stop() {
+        console.log('masuk sini');
         this.current = 0;
         this.size = 1;
         this.queueLock = true;
