@@ -1,7 +1,5 @@
 const {
-    AudioPlayer,
     AudioPlayerStatus,
-    AudioResource,
     createAudioPlayer,
     entersState,
     VoiceConnection,
@@ -181,20 +179,11 @@ class MusicSubscription {
      * Stops audio playback and empties the queue
      */
     stop() {
-        console.log('masuk sini');
         this.current = 0;
         this.size = 1;
         this.queueLock = true;
         this.queue = [];
         this.audioPlayer.stop(true);
-    }
-
-    setCurrent(current) {
-        this.current = current;
-    }
-
-    getCurrent() {
-        return this.current;
     }
 
     /**

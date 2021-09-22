@@ -3,6 +3,7 @@ const { createAudioResource, demuxProbe } = require('@discordjs/voice');
 const { raw } = require('youtube-dl-exec');
 const ytpl = require('ytpl');
 const { MessageEmbed, CommandInteraction } = require('discord.js');
+const { parsePlaylist, parseAlbum } = require('../structures/SpotifyTrack');
 
 const noop = () => {};
 
@@ -157,11 +158,11 @@ class Track {
     /**
      * Creates a Track from a video URL and lifecycle callback methods.
      *
-     * @param {String} playlistId The URL of the video
+     * @param {String} playlistId The URL of the playlist
      * @param methods Lifecycle callbacks
      * @returns The created List of Track
      */
-    static async makeTrackList(playlistId, methods) {
+    static async fromYTPlaylist(playlistId, methods) {
         const rawInfo = await ytpl(playlistId);
         const playlistInfo = {
             playlistName: rawInfo.title,
@@ -189,6 +190,48 @@ class Track {
             });
 
             return track;
+        });
+
+        return { playlistInfo, trackList };
+    }
+
+    /**
+     * Creates a Track from a video URL and lifecycle callback methods.
+     *
+     * @param {String} playlistId The URL of the playlist
+     * @param methods Lifecycle callbacks
+     * @returns The created List of Track
+     */
+    static async fromSpotifyPlaylist(playlistId, methods) {
+        const { playlistName, items } = await parsePlaylist(playlistId);
+        const playlistInfo = {
+            playlistName: playlistName,
+            count: items.length,
+            thumbnail: null,
+        };
+        const trackList = items.map(async (url) => {
+            console.log(url);
+            return await this.from(url, methods);
+        });
+
+        return { playlistInfo, trackList };
+    }
+    /**
+     * Creates a Track from a video URL and lifecycle callback methods.
+     *
+     * @param {String} albumId The URL of the album
+     * @param methods Lifecycle callbacks
+     * @returns The created List of Track
+     */
+    static async fromSpotifyAlbum(albumId, methods) {
+        const { albumName, artists, items } = await parseAlbum(albumId);
+        const playlistInfo = {
+            playlistName: `${artists} - ${albumName}`,
+            count: items.length,
+            thumbnail: null,
+        };
+        const trackList = items.map(async (url) => {
+            return await this.from(await url, methods);
         });
 
         return { playlistInfo, trackList };

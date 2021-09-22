@@ -45,9 +45,7 @@ module.exports = async (client) => {
         // Register for a single guild
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
-        const ids = Object.values(guildsId);
-        // const tks = client.guilds.cache.get('425654507607687178');
-        // await tks.commands.set([]);
+        const ids = Object.values(guildsId).slice(0, 0);
         ids.forEach(async (guildId) => {
             if (!guildId) return;
             const guild = client.guilds.cache.get(guildId);
@@ -95,6 +93,8 @@ module.exports = async (client) => {
                 guild.commands.permissions.set({ fullPermissions });
             });
         });
+        const tks = client.guilds.cache.get('425654507607687178');
+        await tks.commands.set([]);
     });
 
     // mongoose
