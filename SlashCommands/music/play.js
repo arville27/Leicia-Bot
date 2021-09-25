@@ -90,9 +90,9 @@ module.exports = {
                 .next()
                 .value.splice(2, 4)
                 .find((term) => term == 'spotify');
-            // if true then spotify album/track/playlist else its youtube playlist or url
             try {
                 let mediaInfo = null;
+                // if true then spotify album/track/playlist else its youtube playlist or url
                 if (term) {
                     const type = await whatIsIt(param);
                     if (type.track) {

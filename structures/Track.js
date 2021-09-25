@@ -209,11 +209,8 @@ class Track {
             count: items.length,
             thumbnail: null,
         };
-        const trackList = items.map(async (url) => {
-            console.log(url);
-            return await this.from(url, methods);
-        });
-
+        let trackList = items.map((url) => this.from(url, methods));
+        trackList = await Promise.all(trackList);
         return { playlistInfo, trackList };
     }
     /**
@@ -230,10 +227,8 @@ class Track {
             count: items.length,
             thumbnail: null,
         };
-        const trackList = items.map(async (url) => {
-            return await this.from(await url, methods);
-        });
-
+        let trackList = items.map((url) => this.from(url, methods));
+        trackList = await Promise.all(trackList);
         return { playlistInfo, trackList };
     }
 
