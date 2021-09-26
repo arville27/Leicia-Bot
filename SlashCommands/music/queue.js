@@ -82,31 +82,35 @@ module.exports = {
             if (buttonInteract.customId === 'next') {
                 // page += page + 1 < maxPage ? 1 : 0;
                 page++;
+                updateButton(buttonInteract);
             } else if (buttonInteract.customId === 'prev') {
                 // page -= page - 1 >= 0 ? 1 : 0;
                 page--;
+                updateButton(buttonInteract);
             }
 
-            await buttonInteract.update({
-                content: `\`\`\`\n${queue[page]}\n\`\`\``,
-                components: [
-                    new MessageActionRow()
-                        .addComponents(
-                            new MessageButton()
-                                .setCustomId('prev')
-                                .setLabel('Previous Page')
-                                .setStyle('PRIMARY')
-                                .setDisabled(page === 0)
-                        )
-                        .addComponents(
-                            new MessageButton()
-                                .setCustomId('next')
-                                .setLabel('Next Page')
-                                .setStyle('PRIMARY')
-                                .setDisabled(page === maxPage - 1 ? true : false)
-                        ),
-                ],
-            });
+            const updateButton = async (buttonInteract) => {
+                await buttonInteract.update({
+                    content: `\`\`\`\n${queue[page]}\n\`\`\``,
+                    components: [
+                        new MessageActionRow()
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId('prev')
+                                    .setLabel('Previous Page')
+                                    .setStyle('PRIMARY')
+                                    .setDisabled(page === 0)
+                            )
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId('next')
+                                    .setLabel('Next Page')
+                                    .setStyle('PRIMARY')
+                                    .setDisabled(page === maxPage - 1 ? true : false)
+                            ),
+                    ],
+                });
+            };
         });
 
         collector.on('end', async () => {
