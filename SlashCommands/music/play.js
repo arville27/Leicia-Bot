@@ -251,10 +251,11 @@ module.exports = {
                         });
                     },
                     onError(error) {
-                        console.warn(error);
-                        interaction
-                            .followUp({ content: `Error: ${error.message}`, ephemeral: true })
-                            .catch(console.warn);
+                        return;
+                        // console.warn(error);
+                        // interaction
+                        //     .followUp({ content: `Error: ${error}`, ephemeral: true })
+                        //     .catch(console.warn);
                     },
                 });
 
