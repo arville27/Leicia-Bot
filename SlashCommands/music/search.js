@@ -1,6 +1,5 @@
 const { Client, CommandInteraction, MessageActionRow, MessageSelectMenu } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getInfo } = require('ytdl-core');
 const ytsr = require('ytsr');
 const play = require('./play');
 

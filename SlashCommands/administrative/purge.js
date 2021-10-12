@@ -19,9 +19,10 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: true }).catch(() => {});
+        await interaction.deferReply({ ephemeral: true });
         let amount = interaction.options.getInteger('amount');
         let canBeDeleted = 0;
+
         const filterMessage = (message) => {
             const condition = (Date.now() - message.createdTimestamp) / (1000 * 60 * 60 * 24) < 14;
             if (condition) canBeDeleted++;

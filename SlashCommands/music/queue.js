@@ -10,7 +10,7 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
         // Print out the current queue, including up to the next 5 tracks to be played.
         let subscription = client.subscriptions.get(interaction.guildId);
 
@@ -37,8 +37,8 @@ module.exports = {
                     .slice(startIdx, endIdx)
                     .map((track, index) => {
                         const no = `${startIdx + index + 1}`.padStart(2, 0);
-                        const title = `「${no}」 ${track.title.substr(0, 45)}${
-                            track.title.length > 45 ? '...' : ''
+                        const title = `「${no}」 ${track.title.substr(0, 40)}${
+                            track.title.length > 40 ? '...' : ''
                         }`;
                         if (startIdx + index + 1 === subscription.current) {
                             return `${title}\n      ⬐ current track`;
@@ -75,20 +75,10 @@ module.exports = {
         const filter = (buttonInteract) => buttonInteract.user.id === interaction.user.id;
         const collector = interaction.channel.createMessageComponentCollector({
             filter,
-            time: 60 * 1000,
+            time: 30 * 1000,
         });
 
         collector.on('collect', async (buttonInteract) => {
-            if (buttonInteract.customId === 'next') {
-                // page += page + 1 < maxPage ? 1 : 0;
-                page++;
-                updateButton(buttonInteract);
-            } else if (buttonInteract.customId === 'prev') {
-                // page -= page - 1 >= 0 ? 1 : 0;
-                page--;
-                updateButton(buttonInteract);
-            }
-
             const updateButton = async (buttonInteract) => {
                 await buttonInteract.update({
                     content: `\`\`\`\n${queue[page]}\n\`\`\``,
@@ -111,6 +101,14 @@ module.exports = {
                     ],
                 });
             };
+
+            if (buttonInteract.customId === 'next') {
+                page += page + 1 < maxPage ? 1 : 0;
+                updateButton(buttonInteract);
+            } else if (buttonInteract.customId === 'prev') {
+                page -= page - 1 < 0 ? 0 : 1;
+                updateButton(buttonInteract);
+            }
         });
 
         collector.on('end', async () => {

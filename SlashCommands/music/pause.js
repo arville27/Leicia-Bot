@@ -12,7 +12,7 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
         let subscription = client.subscriptions.get(interaction.guildId);
 
         // check if already destroyed but still in the subscriptions map
@@ -29,7 +29,6 @@ module.exports = {
         } else {
             await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
-                ephemeral: true,
             });
         }
     },

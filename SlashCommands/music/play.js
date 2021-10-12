@@ -23,8 +23,16 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
+        // check if already defferd by search command
         if (!interaction.deferred) await interaction.deferReply();
         let subscription = client.subscriptions.get(interaction.guildId);
+
+        try {
+            const log = `[${interaction.guild.name}][${interaction.user.tag}] play ${args}`;
+            console.log(log);
+        } catch (error) {
+            console.log('Error trying to print log message');
+        }
 
         // check if already destroyed but still in the subscriptions map
         if (subscription && subscription.destroyed) {
@@ -67,21 +75,25 @@ module.exports = {
             await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
         } catch (error) {
             console.warn(error);
-            return await interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(
-                            ':octagonal_sign: **Failed to join voice channel within 20 seconds, please try again later!**'
-                        )
-                        .setColor('#eb0000'),
-                ],
-            });
+            return await interaction
+                .followUp({
+                    embeds: [
+                        new MessageEmbed()
+                            .setDescription(
+                                ':octagonal_sign: **Failed to join voice channel within 20 seconds, please try again later!**'
+                            )
+                            .setColor('#eb0000'),
+                    ],
+                })
+                .catch((err) => interaction.channel.send('ERROR'));
         }
 
         let param = args[0];
         const pattern = /([a-z]+:\/\/)(?:([a-z0-9]+)\.)?([a-z0-9]+)\.([a-z]{2,})/g;
+        // check if parameter is a valid url
         if (!param.match(pattern)) {
             // keyword as query
+            // find a relevant youtube url and set it to param, to process it later
             const results = await ytsr(param);
             param = results.items.find((item) => item.type === 'video').url;
         } else {
@@ -103,25 +115,29 @@ module.exports = {
                                 const embed = new MessageEmbed()
                                     .setDescription(':musical_note: **Queue finished**')
                                     .setColor('#eb0000');
-                                return interaction.followUp({
-                                    embeds: [embed],
-                                });
+                                try {
+                                    return interaction.followUp({
+                                        embeds: [embed],
+                                    });
+                                } catch (error) {
+                                    return interaction.channel.send({
+                                        embeds: [embed],
+                                    });
+                                }
                             },
                             onError(error) {
-                                console.warn(error);
-                                interaction
-                                    .followUp({
-                                        content: `Error: ${error.message}`,
-                                        ephemeral: true,
-                                    })
-                                    .catch(console.warn);
+                                return;
                             },
                         });
 
                         trackList.forEach((track) => {
-                            track.setOnStart(() => {
+                            track.setOnStart(async () => {
                                 const trackInfo = Track.generateTrackEmbed(track, interaction);
-                                interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
+                                try {
+                                    await interaction.followUp({ embeds: [trackInfo] });
+                                } catch (err) {
+                                    await interaction.channel.send({ embeds: [trackInfo] });
+                                }
                             });
                         });
 
@@ -137,32 +153,41 @@ module.exports = {
                                 value: `${playlistInfo.count}`,
                             })
                             .setTimestamp();
-                        return await interaction.followUp({ embeds: [mediaInfo] });
+                        try {
+                            return await interaction.followUp({ embeds: [mediaInfo] });
+                        } catch (error) {
+                            return await interaction.channel.send({ embeds: [mediaInfo] });
+                        }
                     } else if (type.playlist) {
                         const { playlistInfo, trackList } = await Track.fromSpotifyPlaylist(param, {
                             onFinish() {
                                 const embed = new MessageEmbed()
                                     .setDescription(':musical_note: **Queue finished**')
                                     .setColor('#eb0000');
-                                return interaction.followUp({
-                                    embeds: [embed],
-                                });
+
+                                try {
+                                    return interaction.followUp({
+                                        embeds: [embed],
+                                    });
+                                } catch (error) {
+                                    return interaction.channel.send({
+                                        embeds: [embed],
+                                    });
+                                }
                             },
                             onError(error) {
-                                console.warn(error);
-                                interaction
-                                    .followUp({
-                                        content: `Error: ${error.message}`,
-                                        ephemeral: true,
-                                    })
-                                    .catch(console.warn);
+                                return;
                             },
                         });
 
                         trackList.forEach((track) => {
-                            track.setOnStart(() => {
+                            track.setOnStart(async () => {
                                 const trackInfo = Track.generateTrackEmbed(track, interaction);
-                                interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
+                                try {
+                                    await interaction.followUp({ embeds: [trackInfo] });
+                                } catch (err) {
+                                    await interaction.channel.send({ embeds: [trackInfo] });
+                                }
                             });
                         });
 
@@ -178,7 +203,11 @@ module.exports = {
                                 value: `${playlistInfo.count}`,
                             })
                             .setTimestamp();
-                        return await interaction.followUp({ embeds: [mediaInfo] });
+                        try {
+                            return await interaction.followUp({ embeds: [mediaInfo] });
+                        } catch (error) {
+                            return await interaction.channel.send({ embeds: [mediaInfo] });
+                        }
                     }
                 }
             } catch (err) {
@@ -197,6 +226,7 @@ module.exports = {
 
         try {
             let mediaInfo = null;
+            // YT Playlist
             if (Track.isPlaylist(param)) {
                 const { playlistInfo, trackList } = await Track.fromYTPlaylist(param, {
                     onFinish() {
@@ -208,17 +238,18 @@ module.exports = {
                         });
                     },
                     onError(error) {
-                        console.warn(error);
-                        interaction
-                            .followUp({ content: `Error: ${error.message}`, ephemeral: true })
-                            .catch(console.warn);
+                        return;
                     },
                 });
 
                 trackList.forEach((track) => {
-                    track.setOnStart(() => {
+                    track.setOnStart(async () => {
                         const trackInfo = Track.generateTrackEmbed(track, interaction);
-                        interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
+                        try {
+                            await interaction.followUp({ embeds: [trackInfo] });
+                        } catch (err) {
+                            await interaction.channel.send({ embeds: [trackInfo] });
+                        }
                     });
                 });
 
@@ -238,24 +269,22 @@ module.exports = {
             } else {
                 // Attempt to create a Track from the user's video URL
                 const track = await Track.from(param, {
-                    onStart() {
+                    async onStart() {
                         const trackInfo = Track.generateTrackEmbed(track, interaction);
-                        interaction.followUp({ embeds: [trackInfo] }).catch(console.warn);
+                        try {
+                            await interaction.followUp({ embeds: [trackInfo] });
+                        } catch (err) {
+                            await interaction.channel.send({ embeds: [trackInfo] });
+                        }
                     },
                     onFinish() {
                         const embed = new MessageEmbed()
                             .setDescription(':musical_note: **Queue finished**')
                             .setColor('#eb0000');
-                        return interaction.followUp({
-                            embeds: [embed],
-                        });
+                        return interaction.channel.send({ embeds: [embed] });
                     },
                     onError(error) {
                         return;
-                        // console.warn(error);
-                        // interaction
-                        //     .followUp({ content: `Error: ${error}`, ephemeral: true })
-                        //     .catch(console.warn);
                     },
                 });
 
@@ -282,10 +311,14 @@ module.exports = {
                     )
                     .setTimestamp();
             }
-            await interaction.followUp({ embeds: [mediaInfo] });
+            try {
+                await interaction.followUp({ embeds: [mediaInfo] });
+            } catch (error) {
+                await interaction.channel.send({ embeds: [mediaInfo] });
+            }
         } catch (error) {
             console.warn(error);
-            await interaction.followUp({
+            await interaction.channel.send({
                 embeds: [
                     new MessageEmbed()
                         .setDescription(

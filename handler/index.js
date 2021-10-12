@@ -46,9 +46,10 @@ module.exports = async (client) => {
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
         const ids = Object.values(guildsId);
+        console.log(ids);
         ids.forEach(async (guildId) => {
-            if (!guildId) return;
             const guild = client.guilds.cache.get(guildId);
+            if (!guild) return;
             await guild.commands.set(arrayOfSlashCommands).then((cmd) => {
                 const getRoles = (commandName) => {
                     const permissions = arrayOfSlashCommands.find(
