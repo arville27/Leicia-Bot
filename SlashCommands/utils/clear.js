@@ -10,7 +10,15 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: true }).catch(() => {});
+        await interaction.deferReply({ ephemeral: true });
+        // Check permissions
+        const permToCheck = 'MANAGE_MESSAGES';
+        const permissions = interaction.channel.permissionsFor(interaction.guild.me);
+        if (!permissions.has(permToCheck)) {
+            return await interaction.followUp(
+                `I dont have permission to do that! (PERM: ${permToCheck})`
+            );
+        }
         const messages = await interaction.channel.messages
             .fetch({ limit: 100 })
             .then((messages) =>
