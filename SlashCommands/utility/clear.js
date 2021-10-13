@@ -29,7 +29,11 @@ module.exports = {
                 )
             );
 
-        await interaction.channel.bulkDelete(messages);
+        try {
+            await interaction.channel.bulkDelete(messages);
+        } catch (error) {
+            console.log('[ERROR] There is a message that cannot be deleted');
+        }
         await interaction.editReply({
             content: 'Successfully clean bot responses',
         });

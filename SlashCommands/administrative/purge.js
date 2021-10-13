@@ -53,7 +53,11 @@ module.exports = {
             });
         }
 
-        await interaction.channel.bulkDelete(messages);
+        try {
+            await interaction.channel.bulkDelete(messages);
+        } catch (error) {
+            console.log('[ERROR] There is a message that cannot be deleted');
+        }
         if (canBeDeleted < amount) {
             await interaction.editReply({
                 content: `Successfuly delete ${canBeDeleted} message(s), the rest cannot be deleted`,
