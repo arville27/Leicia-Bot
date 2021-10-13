@@ -31,7 +31,8 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
     });
 
     const filter = (i) =>
-        i.customId === buttonList[0].customId || i.customId === buttonList[1].customId;
+        (i.customId === buttonList[0].customId || i.customId === buttonList[1].customId) &&
+        i.user === interaction.user;
 
     const collector = await curPage.createMessageComponentCollector({
         filter,
