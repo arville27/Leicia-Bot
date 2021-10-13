@@ -318,15 +318,16 @@ module.exports = {
             }
         } catch (error) {
             console.warn(error);
-            await interaction.channel.send({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(
-                            ':octagonal_sign: **Failed to play track, please try again later!**'
-                        )
-                        .setColor('#eb0000'),
-                ],
-            });
+            const embed = new MessageEmbed()
+                .setDescription(
+                    ':octagonal_sign: **Failed to play track, please try again later!**'
+                )
+                .setColor('#eb0000');
+            try {
+                await interaction.followUp({ embeds: [embed] });
+            } catch (error) {
+                await interaction.channel.send({ embeds: [embed] });
+            }
         }
     },
 };
