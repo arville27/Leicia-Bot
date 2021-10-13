@@ -1,5 +1,6 @@
 const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { getGuildSubscription } = require('../../utils/MusicCommands');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -15,40 +16,32 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: true });
-        let subscription = client.subscriptions.get(interaction.guildId);
+        await interaction.deferReply({ ephemeral: false });
+        const subscription = getGuildSubscription(client, interaction);
 
-        // check if already destroyed but still in the subscriptions map
-        if (subscription && subscription.destroyed) {
-            client.subscriptions.delete(interaction.guildId);
-            subscription = null;
-        }
-
-        if (subscription) {
-            // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
-            // listener defined in music/subscription.ts, transitions into the Idle state mean the next track from the queue
-            // will be loaded and played.
-            const trackNumber = interaction.options.getInteger('no');
-            if (trackNumber >= subscription.size || trackNumber < 1) {
-                return await interaction.followUp({
-                    content: ':diamond_shape_with_a_dot_inside:  Please provide a valid number',
-                    ephemeral: true,
-                });
-            }
-
-            subscription.changeTrack(trackNumber);
-            await interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(`:track_next: **Change to track no ${trackNumber}!**`)
-                        .setColor('#0070eb'),
-                ],
-            });
-        } else {
-            await interaction.followUp({
+        if (!subscription) {
+            return await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
-                ephemeral: true,
             });
         }
+
+        // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
+        // listener defined in music/subscription.ts, transitions into the Idle state mean the next track from the queue
+        // will be loaded and played.
+        const trackNumber = interaction.options.getInteger('no');
+        if (trackNumber >= subscription.size || trackNumber < 1) {
+            return await interaction.followUp({
+                content: ':diamond_shape_with_a_dot_inside:  Please provide a valid number',
+            });
+        }
+
+        subscription.changeTrack(trackNumber);
+        await interaction.followUp({
+            embeds: [
+                new MessageEmbed()
+                    .setDescription(`:track_next: **Change to track no ${trackNumber}!**`)
+                    .setColor('#0070eb'),
+            ],
+        });
     },
 };

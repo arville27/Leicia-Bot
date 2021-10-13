@@ -3,7 +3,7 @@ const { createAudioResource, demuxProbe } = require('@discordjs/voice');
 const { raw } = require('youtube-dl-exec');
 const ytpl = require('ytpl');
 const { MessageEmbed, CommandInteraction } = require('discord.js');
-const { parsePlaylist, parseAlbum } = require('../structures/SpotifyTrack');
+const { parsePlaylist, parseAlbum } = require('../utils/SpotifyTrack');
 
 const noop = () => {};
 

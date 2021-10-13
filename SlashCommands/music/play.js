@@ -4,7 +4,8 @@ const { MusicSubscription } = require('../../structures/MusicSubscription');
 const { entersState, joinVoiceChannel, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
 const ytsr = require('ytsr');
-const { parseTrack, whatIsIt } = require('../../structures/SpotifyTrack');
+const { parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
+const { getGuildSubscription } = require('../../utils/MusicCommands');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -12,7 +13,7 @@ module.exports = {
         .setDescription('Plays a song from YouTube')
         .addStringOption((option) =>
             option
-                .setName('song')
+                .setName('source')
                 .setDescription('This can be a URL of the song/playlist to play or a keyword')
                 .setRequired(true)
         ),
@@ -25,19 +26,13 @@ module.exports = {
     run: async (client, interaction, args) => {
         // check if already defferd by search command
         if (!interaction.deferred) await interaction.deferReply();
-        let subscription = client.subscriptions.get(interaction.guildId);
+        let subscription = getGuildSubscription(client, interaction);
 
         try {
             const log = `[${interaction.guild.name}][${interaction.user.tag}] play ${args}`;
             console.log(log);
         } catch (error) {
             console.log('Error trying to print log message');
-        }
-
-        // check if already destroyed but still in the subscriptions map
-        if (subscription && subscription.destroyed) {
-            client.subscriptions.delete(interaction.guildId);
-            subscription = null;
         }
 
         // If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
@@ -72,7 +67,7 @@ module.exports = {
 
         // Make sure the connection is ready before processing the user's request
         try {
-            await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
+            await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
         } catch (error) {
             console.warn(error);
             return await interaction

@@ -1,5 +1,6 @@
 const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { getGuildSubscription } = require('../../utils/MusicCommands');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -13,13 +14,7 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: false });
-        let subscription = client.subscriptions.get(interaction.guildId);
-
-        // check if already destroyed but still in the subscriptions map
-        if (subscription && subscription.destroyed) {
-            client.subscriptions.delete(interaction.guildId);
-            subscription = null;
-        }
+        const subscription = getGuildSubscription(client, interaction);
 
         if (subscription) {
             subscription.audioPlayer.unpause();

@@ -1,6 +1,7 @@
 const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const paginationEmbed = require('../../structures/EmbedPagination');
+const { getGuildSubscription } = require('../../utils/MusicCommands');
+const paginationEmbed = require('../../utils/EmbedPagination');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('queue').setDescription('See the music queue'),
@@ -12,14 +13,7 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: false });
-        // Print out the current queue, including up to the next 5 tracks to be played.
-        let subscription = client.subscriptions.get(interaction.guildId);
-
-        // check if already destroyed but still in the subscriptions map
-        if (subscription && subscription.destroyed) {
-            client.subscriptions.delete(interaction.guildId);
-            subscription = null;
-        }
+        const subscription = getGuildSubscription(client, interaction);
 
         if (!subscription) {
             return await interaction.followUp({
