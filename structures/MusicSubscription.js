@@ -128,6 +128,10 @@ class MusicSubscription {
         voiceConnection.subscribe(this.audioPlayer);
     }
 
+    getCurrentTrack() {
+        return this.queue[this.current];
+    }
+
     skip() {
         this.audioPlayer.stop();
     }

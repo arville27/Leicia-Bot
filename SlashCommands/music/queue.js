@@ -1,5 +1,6 @@
-const { Client, CommandInteraction, MessageActionRow, MessageButton } = require('discord.js');
+const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const paginationEmbed = require('../../structures/EmbedPagination');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('queue').setDescription('See the music queue'),
@@ -26,100 +27,50 @@ module.exports = {
             });
         }
 
-        let page = 0;
-        let maxPage = Math.ceil(subscription.queue.length / 20);
-        const queue = [];
+        const generateTrackInfo = (no, track) => {
+            const number = `${no}`.padStart(2, 0);
+            const title = `${track.title.substr(0, 30)}${track.title.length > 30 ? '...' : ''}`;
+            const duration = track.getTrackDuration();
+            const url = track.url;
+            return no
+                ? `\`「${number}」\` [${title}](${url}) ${duration}`
+                : `[${title}](${url}) ${duration}`;
+        };
+        let maxPage = Math.ceil(subscription.queue.length / 10);
+        const trackInfo = [];
         for (let i = 0; i < maxPage; i++) {
-            let startIdx = i * 20;
-            let endIdx = (i + 1) * 20;
-            queue.push(
+            let startIdx = i * 10;
+            let endIdx = (i + 1) * 10;
+            trackInfo.push(
                 subscription.queue
                     .slice(startIdx, endIdx)
-                    .map((track, index) => {
-                        const no = `${startIdx + index + 1}`.padStart(2, 0);
-                        const title = `「${no}」 ${track.title.substr(0, 40)}${
-                            track.title.length > 40 ? '...' : ''
-                        }`;
-                        if (startIdx + index + 1 === subscription.current) {
-                            return `${title}\n      ⬐ current track`;
-                        } else if (startIdx + index - 1 === subscription.current) {
-                            return `      ⬑ current track\n${title}`;
-                        }
-                        return `${title}`;
-                    })
+                    .map((track, index) => generateTrackInfo(startIdx + index + 1, track))
                     .join('\n')
             );
         }
-        const button = new MessageActionRow()
-            .addComponents(
-                new MessageButton()
-                    .setCustomId('prev')
-                    .setLabel('Previous Page')
-                    .setStyle('PRIMARY')
-                    .setDisabled(true)
-            )
-            .addComponents(
-                new MessageButton()
-                    .setCustomId('next')
-                    .setLabel('Next Page')
-                    .setStyle('PRIMARY')
-                    .setDisabled(maxPage > 1 ? false : true)
-            );
 
-        const master = await interaction.followUp({
-            content: `\`\`\`\n${queue[page]}\n\`\`\``,
-            components: [button],
+        const currTrack = subscription.getCurrentTrack();
+        const currTrackInfo = currTrack
+            ? generateTrackInfo(null, currTrack)
+            : 'Currently not playing';
+        const pages = trackInfo.map((list) => {
+            return new MessageEmbed()
+                .setColor('#93C5F7')
+                .setTitle(`Music Queue (${subscription.queue.length} tracks)`)
+                .addField('Now Playing', `${currTrackInfo}\n\n${list}`);
         });
 
-        // Button collector
-        const filter = (buttonInteract) => buttonInteract.user.id === interaction.user.id;
-        const collector = interaction.channel.createMessageComponentCollector({
-            filter,
-            time: 30 * 1000,
-        });
+        //create an array of buttons
+        const buttonList = [
+            new MessageButton().setCustomId('previousbtn').setLabel('Previous').setStyle('DANGER'),
+            new MessageButton().setCustomId('nextbtn').setLabel('Next').setStyle('SUCCESS'),
+            new MessageButton()
+                .setCustomId('caller')
+                .setLabel(`Called by ${interaction.user.tag}`)
+                .setStyle('SECONDARY')
+                .setDisabled(true),
+        ];
 
-        collector.on('collect', async (buttonInteract) => {
-            const updateButton = async (buttonInteract) => {
-                await buttonInteract.update({
-                    content: `\`\`\`\n${queue[page]}\n\`\`\``,
-                    components: [
-                        new MessageActionRow()
-                            .addComponents(
-                                new MessageButton()
-                                    .setCustomId('prev')
-                                    .setLabel('Previous Page')
-                                    .setStyle('PRIMARY')
-                                    .setDisabled(page === 0)
-                            )
-                            .addComponents(
-                                new MessageButton()
-                                    .setCustomId('next')
-                                    .setLabel('Next Page')
-                                    .setStyle('PRIMARY')
-                                    .setDisabled(page === maxPage - 1 ? true : false)
-                            ),
-                    ],
-                });
-            };
-
-            if (buttonInteract.customId === 'next') {
-                page += page + 1 < maxPage ? 1 : 0;
-                updateButton(buttonInteract);
-            } else if (buttonInteract.customId === 'prev') {
-                page -= page - 1 < 0 ? 0 : 1;
-                updateButton(buttonInteract);
-            }
-        });
-
-        collector.on('end', async () => {
-            try {
-                await master.edit({
-                    content: `\`\`\`\n${queue[page]}\n\`\`\``,
-                    components: [],
-                });
-            } catch (err) {
-                console.log('The message already dismissed');
-            }
-        });
+        paginationEmbed(interaction, pages, buttonList);
     },
 };
