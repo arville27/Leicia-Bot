@@ -70,17 +70,15 @@ module.exports = {
             await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
         } catch (error) {
             console.warn(error);
-            return await interaction
-                .followUp({
-                    embeds: [
-                        new MessageEmbed()
-                            .setDescription(
-                                ':octagonal_sign: **Failed to join voice channel within 20 seconds, please try again later!**'
-                            )
-                            .setColor('#eb0000'),
-                    ],
-                })
-                .catch((err) => interaction.channel.send('ERROR'));
+            return await interaction.followUp({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(
+                            ':octagonal_sign: **Failed to join voice channel within 20 seconds, please try again later!**'
+                        )
+                        .setColor('#eb0000'),
+                ],
+            });
         }
 
         let param = args[0];

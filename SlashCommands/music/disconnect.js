@@ -1,4 +1,4 @@
-const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
+const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands');
 
@@ -12,22 +12,35 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: false });
-        let subscription = getGuildSubscription(client, interaction);
 
-        if (subscription) {
-            subscription.voiceConnection.destroy();
-            client.subscriptions.delete(interaction.guildId);
-            await interaction.followUp({
+        // check if user in voice channel
+        if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
+            return await interaction.followUp({
                 embeds: [
                     new MessageEmbed()
-                        .setDescription(':small_red_triangle: **Disconnected from channel!**')
+                        .setDescription(
+                            ':octagonal_sign: **Join a voice channel and then try that again!**'
+                        )
                         .setColor('#eb0000'),
                 ],
             });
-        } else {
-            await interaction.followUp({
+        }
+
+        let subscription = getGuildSubscription(client, interaction);
+        if (!subscription) {
+            return await interaction.followUp({
                 content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
             });
         }
+
+        subscription.voiceConnection.destroy();
+        client.subscriptions.delete(interaction.guildId);
+        await interaction.followUp({
+            embeds: [
+                new MessageEmbed()
+                    .setDescription(':small_red_triangle: **Disconnected from channel!**')
+                    .setColor('#eb0000'),
+            ],
+        });
     },
 };
