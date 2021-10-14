@@ -95,9 +95,6 @@ class MusicSubscription {
 
         // Configure audio player
         this.audioPlayer.on('stateChange', async (oldState, newState) => {
-            console.log(oldState.status);
-            console.log(newState.status);
-            console.log('');
             if (
                 oldState.status === AudioPlayerStatus.Playing &&
                 newState.status === AudioPlayerStatus.Idle
@@ -106,7 +103,6 @@ class MusicSubscription {
                 // The queue is then processed to start playing the next track, if one is available.
                 this.current++;
                 if (!this.queue.at(this.current) && !this.destroyed) {
-                    console.log('masuk yng stop');
                     oldState.resource.metadata.onFinish();
                     this.leave = true;
                     this.timeout = await wait(5 * 60_000);
@@ -128,7 +124,6 @@ class MusicSubscription {
                 oldState.status === AudioPlayerStatus.Playing &&
                 newState.status === AudioPlayerStatus.Paused
             ) {
-                console.log('masuk yng pause');
                 this.leave = true;
                 this.timeout = await wait(5 * 60_000);
                 if (this.leave) {
