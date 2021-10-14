@@ -1,4 +1,11 @@
-const { Client, CommandInteraction, MessageActionRow, MessageSelectMenu } = require('discord.js');
+const {
+    Client,
+    CommandInteraction,
+    MessageActionRow,
+    MessageSelectMenu,
+    MessageEmbed,
+    GuildMember,
+} = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const ytsr = require('ytsr');
 const play = require('./play');
@@ -18,6 +25,20 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: true });
+
+        // check if user in voice channel
+        if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
+            return await interaction.followUp({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(
+                            ':octagonal_sign: **Join a voice channel and then try that again!**'
+                        )
+                        .setColor('#eb0000'),
+                ],
+            });
+        }
+
         const terms = interaction.options.getString('terms');
         const results = await ytsr(terms, { limit: 20 });
         const listSong = results.items
