@@ -69,6 +69,7 @@ class MusicSubscription {
                 /*
 					Once destroyed, stop the subscription
 				*/
+                this.destroyed = true;
                 this.stop();
             } else if (
                 !this.readyLock &&
