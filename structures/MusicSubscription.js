@@ -95,14 +95,18 @@ class MusicSubscription {
 
         // Configure audio player
         this.audioPlayer.on('stateChange', async (oldState, newState) => {
+            console.log(oldState.status);
+            console.log(newState.status);
+            console.log('');
             if (
-                newState.status === AudioPlayerStatus.Idle &&
-                oldState.status !== AudioPlayerStatus.Idle
+                oldState.status === AudioPlayerStatus.Playing &&
+                newState.status === AudioPlayerStatus.Idle
             ) {
                 // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                 // The queue is then processed to start playing the next track, if one is available.
                 this.current++;
-                if (!this.queue.at(this.current)) {
+                if (!this.queue.at(this.current) && !this.destroyed) {
+                    console.log('masuk yng stop');
                     oldState.resource.metadata.onFinish();
                     this.leave = true;
                     this.timeout = await wait(5 * 60_000);
@@ -110,7 +114,7 @@ class MusicSubscription {
                         try {
                             this.voiceConnection.destroy();
                         } catch (err) {
-                            console.log('Voice connection already destroyed');
+                            console.log('[IDLE] Voice connection already destroyed');
                         }
                         this.destroyed = true;
                     }
@@ -120,6 +124,21 @@ class MusicSubscription {
                 // If the Playing state has been entered, then a new track has started playback.
                 this.leave = false;
                 newState.resource.metadata.onStart();
+            } else if (
+                oldState.status === AudioPlayerStatus.Playing &&
+                newState.status === AudioPlayerStatus.Paused
+            ) {
+                console.log('masuk yng pause');
+                this.leave = true;
+                this.timeout = await wait(5 * 60_000);
+                if (this.leave) {
+                    try {
+                        this.voiceConnection.destroy();
+                    } catch (err) {
+                        console.log('[PAUSED] Voice connection already destroyed');
+                    }
+                    this.destroyed = true;
+                }
             }
         });
 
