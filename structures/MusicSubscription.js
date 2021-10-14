@@ -8,8 +8,6 @@ const {
 } = require('@discordjs/voice');
 const { Track } = require('./Track');
 const { wait, createCancellableSignal } = require('../utils/CancellablePromise');
-const { signal, cancelTimeout } = createCancellableSignal();
-
 /**
  * A MusicSubscription exists for each active VoiceConnection. Each subscription has its own audio player and queue,
  * and it also attaches logic to the audio player and voice connection for error handling and reconnection logic.
@@ -26,6 +24,7 @@ class MusicSubscription {
         this.destroyed = false;
         this.queueLock = false;
         this.readyLock = false;
+        this.timeout = createCancellableSignal();
         this.voiceConnection = voiceConnection;
         this.audioPlayer = createAudioPlayer();
         this.queue = [];
@@ -105,7 +104,7 @@ class MusicSubscription {
                 if (!this.queue.at(this.current) && !this.destroyed) {
                     oldState.resource.metadata.onFinish();
                     this.leave = true;
-                    await wait(signal, 5 * 60_000).catch(() => void 0);
+                    await wait(this.timeout.signal, 5 * 60_000).catch(() => void 0);
                     if (this.leave) {
                         try {
                             this.voiceConnection.destroy();
@@ -119,7 +118,8 @@ class MusicSubscription {
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
                 if (this.leave) {
-                    cancelTimeout();
+                    this.timeout.cancelTimeout();
+                    this.timeout = createCancellableSignal();
                 }
                 this.leave = false;
                 newState.resource.metadata.onStart();
@@ -128,7 +128,7 @@ class MusicSubscription {
                 newState.status === AudioPlayerStatus.Paused
             ) {
                 this.leave = true;
-                await wait(signal, 5 * 60_000).catch(() => void 0);
+                await wait(this.timeout.signal, 5 * 60_000).catch(() => void 0);
                 if (this.leave) {
                     try {
                         this.voiceConnection.destroy();
@@ -149,12 +149,33 @@ class MusicSubscription {
         return this.queue[this.current];
     }
 
+    pause() {
+        if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
+            this.audioPlayer.pause();
+            return true;
+        }
+        return false;
+    }
+
+    resume() {
+        if (this.audioPlayer.state.status === AudioPlayerStatus.Paused) {
+            this.audioPlayer.unpause();
+            return true;
+        }
+        return false;
+    }
+
     skip() {
-        this.audioPlayer.stop();
+        if (this.audioPlayer.state.status === AudioPlayerStatus.Idle) {
+            this.current++;
+            this.processQueue();
+        } else {
+            this.audioPlayer.stop();
+        }
     }
 
     prev() {
-        if (this.audioPlayer.state.status == AudioPlayerStatus.Idle) {
+        if (this.audioPlayer.state.status === AudioPlayerStatus.Idle) {
             this.current -= 1;
             this.processQueue();
         } else {
@@ -164,7 +185,7 @@ class MusicSubscription {
     }
 
     changeTrack(index) {
-        if (this.audioPlayer.state.status == AudioPlayerStatus.Idle) {
+        if (this.audioPlayer.state.status === AudioPlayerStatus.Idle) {
             this.current = index - 1;
             this.processQueue();
         } else {
