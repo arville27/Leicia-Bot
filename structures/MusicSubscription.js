@@ -7,8 +7,8 @@ const {
     VoiceConnectionStatus,
 } = require('@discordjs/voice');
 const { Track } = require('./Track');
-const { promisify } = require('util');
-const wait = promisify(setTimeout);
+const { wait, createCancellableSignal } = require('../utils/CancellablePromise');
+const { signal, cancelTimeout } = createCancellableSignal();
 
 /**
  * A MusicSubscription exists for each active VoiceConnection. Each subscription has its own audio player and queue,
@@ -105,7 +105,7 @@ class MusicSubscription {
                 if (!this.queue.at(this.current) && !this.destroyed) {
                     oldState.resource.metadata.onFinish();
                     this.leave = true;
-                    this.timeout = await wait(5 * 60_000);
+                    await wait(signal, 5 * 60_000).catch(() => void 0);
                     if (this.leave) {
                         try {
                             this.voiceConnection.destroy();
@@ -118,6 +118,9 @@ class MusicSubscription {
                 void this.processQueue();
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
+                if (this.leave) {
+                    cancelTimeout();
+                }
                 this.leave = false;
                 newState.resource.metadata.onStart();
             } else if (
@@ -125,7 +128,7 @@ class MusicSubscription {
                 newState.status === AudioPlayerStatus.Paused
             ) {
                 this.leave = true;
-                this.timeout = await wait(5 * 60_000);
+                await wait(signal, 5 * 60_000).catch(() => void 0);
                 if (this.leave) {
                     try {
                         this.voiceConnection.destroy();
