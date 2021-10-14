@@ -41,7 +41,8 @@ module.exports = {
         if (!amount) {
             messages = await interaction.channel.messages
                 .fetch({ limit: 100 })
-                .then((messages) => messages.filter(filterMessage));
+                .then((messages) => messages.filter(filterMessage))
+                .catch((err) => console.warn('Error while fetching messages'));
             amount = 0;
         } else if (amount < 100) {
             messages = await interaction.channel.messages

@@ -27,7 +27,8 @@ module.exports = {
                         message.author.id === client.user.id &&
                         (Date.now() - message.createdTimestamp) / (1000 * 60 * 60 * 24) < 14
                 )
-            );
+            )
+            .catch((err) => console.warn('Error while fetching messages'));
 
         try {
             await interaction.channel.bulkDelete(messages);
