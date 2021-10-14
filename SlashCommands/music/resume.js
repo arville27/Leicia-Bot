@@ -16,8 +16,14 @@ module.exports = {
         await interaction.deferReply({ ephemeral: false });
         const subscription = getGuildSubscription(client, interaction);
 
-        if (subscription) {
-            subscription.audioPlayer.unpause();
+        if (!subscription) {
+            return await interaction.followUp({
+                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+            });
+        }
+
+        // subscription.resume() will return true if current audioPlayer state is paused
+        if (subscription.resume()) {
             await interaction.followUp({
                 embeds: [
                     new MessageEmbed()
@@ -27,7 +33,11 @@ module.exports = {
             });
         } else {
             await interaction.followUp({
-                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(':arrow_forward: **Already playing!**')
+                        .setColor('#00eb55'),
+                ],
             });
         }
     },

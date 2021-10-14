@@ -16,14 +16,20 @@ module.exports = {
         await interaction.deferReply({ ephemeral: false });
         const subscription = getGuildSubscription(client, interaction);
 
-        if (subscription) {
-            subscription.audioPlayer.pause();
+        if (!subscription) {
+            return await interaction.followUp({
+                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+            });
+        }
+
+        // subscription.pause() will return true if current audioPlayer state is Playing
+        if (subscription.pause()) {
             await interaction.followUp({
                 embeds: [new MessageEmbed().setDescription(':pause_button: **Paused!**')],
             });
         } else {
             await interaction.followUp({
-                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+                embeds: [new MessageEmbed().setDescription(':pause_button: **Already Paused!**')],
             });
         }
     },
