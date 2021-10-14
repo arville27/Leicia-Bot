@@ -152,6 +152,10 @@ class MusicSubscription {
         return this.queue[this.current];
     }
 
+    getCurrPosition() {
+        return this.size++;
+    }
+
     pause() {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
             this.audioPlayer.pause();
@@ -212,20 +216,18 @@ class MusicSubscription {
      *
      * @param {Track} track The track to add to the queue
      */
-    enqueue(track) {
-        track.position = this.size++;
-        this.queue.push(track);
-        void this.processQueue();
-    }
+    // enqueue(track) {
+    //     this.queue.push(track);
+    //     void this.processQueue();
+    // }
 
     /**
      * Adds a new Track to the queue.
      *
      * @param {Track[]} trackList The track to add to the queue
      */
-    enqueueList(trackList) {
+    enqueue(trackList) {
         trackList.forEach((track) => {
-            track.position = this.size++;
             this.queue.push(track);
         });
         void this.processQueue();

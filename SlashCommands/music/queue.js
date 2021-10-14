@@ -1,6 +1,6 @@
 const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getGuildSubscription } = require('../../utils/MusicCommands');
+const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const paginationEmbed = require('../../utils/EmbedPagination');
 
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
         const generateTrackInfo = (no, track) => {
             const number = `${no}`.padStart(2, 0);
             const title = `${track.title.substr(0, 30)}${track.title.length > 30 ? '...' : ''}`;
-            const duration = track.getTrackDuration();
+            const duration = track.duration;
             const url = track.url;
             return no
                 ? `\`「${number}」\` [${title}](${url}) ${duration}`

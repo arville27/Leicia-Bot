@@ -1,6 +1,6 @@
 const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getGuildSubscription } = require('../../utils/MusicCommands');
+const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 
 module.exports = {
     ...new SlashCommandBuilder().setName('dc').setDescription('Disconnect from the voice channel'),

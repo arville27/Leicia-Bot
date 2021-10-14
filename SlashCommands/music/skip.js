@@ -1,7 +1,7 @@
 const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { AudioPlayerStatus } = require('@discordjs/voice');
-const { getGuildSubscription } = require('../../utils/MusicCommands');
+const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 
 module.exports = {
     ...new SlashCommandBuilder()
