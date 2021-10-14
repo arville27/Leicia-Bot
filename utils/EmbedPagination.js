@@ -58,7 +58,7 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
         collector.resetTimer();
     });
 
-    collector.on('end', () => {
+    collector.on('end', async () => {
         if (!curPage.deleted) {
             // const disabledRow = new MessageActionRow().addComponents(
             //     buttonList[0].setDisabled(true),
@@ -68,7 +68,7 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
             //     embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
             //     components: [disabledRow],
             // });
-            curPage.delete();
+            await curPage.delete().catch(() => void 0);
         }
     });
 
