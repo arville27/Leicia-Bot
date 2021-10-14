@@ -20,22 +20,3 @@ function createCancellableSignal() {
 }
 
 module.exports = { wait, createCancellableSignal };
-
-// let promise = null;
-
-// (async () => {
-//     const { signal, cancel } = createCancellableSignal();
-//     promise = await wait(signal, 5000);
-//     console.log('1');
-//     console.log('2');
-//     console.log('3');
-//     // cancel();
-// })();
-
-// (async () => {
-//     console.log('1');
-//     console.log('2');
-//     console.log(promise);
-//     console.log('3');
-//     // cancel();
-// })();
