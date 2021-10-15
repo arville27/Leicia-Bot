@@ -206,6 +206,12 @@ function filterMessage(interaction) {
         .setColor('#0070eb');
 }
 
+function queueIsEmpty() {
+    return new MessageEmbed()
+        .setDescription(':diamond_shape_with_a_dot_inside:  The queue is empty')
+        .setColor('#eb0000');
+}
+
 const response = {
     singleTrackEmbed,
     albumEmbed,
@@ -228,6 +234,7 @@ const response = {
     lastTrackInQueue,
     noResultsFound,
     selectMenuPrompt,
+    queueIsEmpty,
 };
 
 module.exports = { response };

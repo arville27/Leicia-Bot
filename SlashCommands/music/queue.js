@@ -20,6 +20,11 @@ module.exports = {
             return await interaction.followUp({
                 embeds: [response.noSubscriptionAvailable()],
             });
+        } else if (subscription && subscription.queue.length == 0) {
+            // subscription is created, by the queue is empty
+            return await interaction.followUp({
+                embeds: [response.queueIsEmpty()],
+            });
         }
 
         const generateTrackInfo = (no, track) => {
