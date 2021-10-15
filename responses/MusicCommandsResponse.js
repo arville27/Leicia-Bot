@@ -132,6 +132,10 @@ function disconnectFromVoiceChannel() {
         .setColor('#eb0000');
 }
 
+function noResultsFound() {
+    return new MessageEmbed().setDescription(':mag: **No results found!**').setColor('#eb0000');
+}
+
 /**
  *
  * @param {Boolean} state
@@ -166,6 +170,26 @@ function successfulSkipTrack() {
     return new MessageEmbed().setDescription(':track_next: **Skipped song!**').setColor('#0070eb');
 }
 
+function selectMenuPrompt() {
+    return new MessageEmbed().setDescription('**Select a song to play!**').setColor('#0070eb');
+}
+
+function selectedMenuMessage() {
+    return new MessageEmbed()
+        .setDescription(':diamond_shape_with_a_dot_inside: Already selected')
+        .setColor('#0070eb');
+}
+
+/**
+ *
+ * @param {CommandInteraction} interaction
+ */
+function filterMessage(interaction) {
+    return new MessageEmbed()
+        .setDescription(`This only can be used by ${interaction.user}`)
+        .setColor('#0070eb');
+}
+
 const response = {
     singleTrackEmbed,
     albumEmbed,
@@ -179,10 +203,14 @@ const response = {
     disconnectFromVoiceChannel,
     pauseAudioPlayer,
     successfulPrevTrack,
+    selectedMenuMessage,
     firstTrackInSubscription,
     unpauseAudioPlayer,
+    filterMessage,
     successfulSkipTrack,
     lastTrackInQueue,
+    noResultsFound,
+    selectMenuPrompt,
 };
 
 module.exports = { response };

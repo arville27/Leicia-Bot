@@ -3,7 +3,6 @@ const {
     CommandInteraction,
     MessageActionRow,
     MessageSelectMenu,
-    MessageEmbed,
     GuildMember,
 } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
@@ -25,7 +24,7 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
 
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
@@ -52,18 +51,21 @@ module.exports = {
                 .addOptions(listSong)
         );
 
-        if (listSong.length > 0) {
-            await interaction.followUp({
-                content: 'Select a song that you want to play',
-                components: [row],
-            });
-        } else {
-            return await interaction.followUp('There is no such song');
+        if (listSong.length == 0) {
+            return await interaction.followUp({ embeds: [response.noResultsFound()] });
         }
 
+        const master = await interaction.followUp({
+            embeds: [response.selectMenuPrompt()],
+            components: [row],
+        });
+
         // Selection Menu collector
-        const filter = (componentInteraction) =>
-            componentInteraction.user.id === interaction.user.id;
+        const filter = (componentInteraction) => {
+            if (componentInteraction.user.id === interaction.user.id) return true;
+            interaction.channel.send({ embeds: [response.filterMessage(interaction)] });
+            return false;
+        };
         const collector = interaction.channel.createMessageComponentCollector({
             filter,
             max: 1,
@@ -72,14 +74,18 @@ module.exports = {
         });
 
         collector.on('collect', async (componentInteraction) => {
-            // console.log(componentInteraction.values[0]);
-            // await componentInteraction.update({
-            //     content: ':diamond_shape_with_a_dot_inside: Already selected',
-            //     components: [],
-            // });
-            await play.run(client, componentInteraction, componentInteraction.values).catch(() => {
-                console.log('probably already dismissed');
-            });
+            await play.run(client, componentInteraction, componentInteraction.values);
+        });
+
+        collector.on('end', async () => {
+            if (!master.deleted) {
+                await master
+                    .edit({
+                        embeds: [response.selectedMenuMessage()],
+                        components: [],
+                    })
+                    .catch(() => console.log('[ERROR] Select menu already deleted'));
+            }
         });
     },
 };
