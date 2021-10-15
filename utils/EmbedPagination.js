@@ -35,7 +35,7 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
         const validId =
             i.customId === buttonList[0].customId || i.customId === buttonList[1].customId;
         if (validId && i.user === interaction.user) return true;
-        else if (validId) i.channel.send({ embeds: [response.filterMessage(i)] });
+        else if (validId) i.channel.send({ embeds: [response.filterMessage(interaction)] });
         return false;
     };
 
