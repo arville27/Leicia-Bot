@@ -9,6 +9,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const ytsr = require('ytsr');
 const play = require('./play');
 const { response } = require('../../responses/MusicCommandsResponse');
+const { promisify } = require('util');
+const wait = promisify(setTimeout);
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -63,7 +65,13 @@ module.exports = {
         // Selection Menu collector
         const filter = (componentInteraction) => {
             if (componentInteraction.user.id === interaction.user.id) return true;
-            interaction.channel.send({ embeds: [response.filterMessage(interaction)] });
+            interaction.channel
+                .send({ embeds: [response.filterMessage(interaction)] })
+                .then(async (msg) => {
+                    await wait(8_000);
+                    msg.delete();
+                })
+                .catch(() => void 0);
             return false;
         };
         const collector = interaction.channel.createMessageComponentCollector({
