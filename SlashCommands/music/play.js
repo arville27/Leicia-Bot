@@ -66,93 +66,118 @@ module.exports = {
             if (mc.isUrl(['spotify'], param)) {
                 const type = await whatIsIt(param);
                 if (type.track) {
-                    param = (await parseTrack(param)).url;
-                    const track = await mc.TrackMetadataFromYTUrl(param);
-                    const trackPosition = subscription.getCurrPosition();
-                    trackPlaylist.push(
-                        new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
-                    );
+                    try {
+                        param = (await parseTrack(param)).url;
+                        const track = await mc.TrackMetadataFromYTUrl(param);
+                        const trackPosition = subscription.getCurrPosition();
+                        trackPlaylist.push(
+                            new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
+                        );
 
-                    mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                        mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                    } catch (error) {
+                        console.log(error, '\n');
+                    }
                 } else if (type.album) {
-                    const { playlistInfo, trackList } = await mc.TrackMetadatafromSpotifyAlbum(
-                        param
-                    );
-
-                    trackList.forEach((track) => {
-                        trackPlaylist.push(
-                            new Track(
-                                track,
-                                mc.trackInfoMethods(
-                                    interaction,
-                                    track,
-                                    subscription.getCurrPosition()
-                                )
-                            )
+                    try {
+                        const { playlistInfo, trackList } = await mc.TrackMetadatafromSpotifyAlbum(
+                            param
                         );
-                    });
 
-                    mediaInfo = response.albumEmbed(interaction, playlistInfo);
+                        trackList.forEach((track) => {
+                            trackPlaylist.push(
+                                new Track(
+                                    track,
+                                    mc.trackInfoMethods(
+                                        interaction,
+                                        track,
+                                        subscription.getCurrPosition()
+                                    )
+                                )
+                            );
+                        });
+
+                        mediaInfo = response.albumEmbed(interaction, playlistInfo);
+                    } catch (error) {
+                        console.log(error, '\n');
+                    }
                 } else if (type.playlist) {
-                    const { playlistInfo, trackList } = await mc.TrackMetadatafromSpotifyPlaylist(
-                        param
-                    );
+                    try {
+                        const { playlistInfo, trackList } =
+                            await mc.TrackMetadatafromSpotifyPlaylist(param);
 
-                    trackList.forEach((track) => {
-                        trackPlaylist.push(
-                            new Track(
-                                track,
-                                mc.trackInfoMethods(
-                                    interaction,
+                        trackList.forEach((track) => {
+                            trackPlaylist.push(
+                                new Track(
                                     track,
-                                    subscription.getCurrPosition()
+                                    mc.trackInfoMethods(
+                                        interaction,
+                                        track,
+                                        subscription.getCurrPosition()
+                                    )
                                 )
-                            )
-                        );
-                    });
+                            );
+                        });
 
-                    mediaInfo = response.playlistEmbed(interaction, playlistInfo);
+                        mediaInfo = response.playlistEmbed(interaction, playlistInfo);
+                    } catch (error) {
+                        console.log(error, '\n');
+                    }
                 }
             } else if (mc.isUrl(['youtube'], param)) {
                 if (mc.isYTPlaylist(param)) {
-                    const { playlistInfo, trackList } = await mc.TrackMetadataFromYTPlaylist(param);
-
-                    trackList.forEach((track) => {
-                        trackPlaylist.push(
-                            new Track(
-                                track,
-                                mc.trackInfoMethods(
-                                    interaction,
-                                    track,
-                                    subscription.getCurrPosition()
-                                )
-                            )
+                    try {
+                        const { playlistInfo, trackList } = await mc.TrackMetadataFromYTPlaylist(
+                            param
                         );
-                    });
 
-                    mediaInfo = response.playlistEmbed(interaction, playlistInfo);
+                        trackList.forEach((track) => {
+                            trackPlaylist.push(
+                                new Track(
+                                    track,
+                                    mc.trackInfoMethods(
+                                        interaction,
+                                        track,
+                                        subscription.getCurrPosition()
+                                    )
+                                )
+                            );
+                        });
+
+                        mediaInfo = response.playlistEmbed(interaction, playlistInfo);
+                    } catch (error) {
+                        console.log(error, '\n');
+                    }
                 } else {
-                    const track = await mc.TrackMetadataFromYTUrl(param);
-                    const trackPosition = subscription.getCurrPosition();
-                    trackPlaylist.push(
-                        new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
-                    );
+                    try {
+                        const track = await mc.TrackMetadataFromYTUrl(param);
+                        const trackPosition = subscription.getCurrPosition();
+                        trackPlaylist.push(
+                            new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
+                        );
 
-                    mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                        mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                    } catch (error) {
+                        console.log(error, '\n');
+                    }
                 }
             }
         } else {
-            // keyword as query
-            // find a relevant youtube url and set it to param
-            const results = await ytsr(param);
-            param = results.items.find((item) => item.type === 'video').url;
-            const track = await mc.TrackMetadataFromYTUrl(param);
-            const trackPosition = subscription.getCurrPosition();
-            trackPlaylist.push(
-                new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
-            );
+            try {
+                // keyword as query
+                // find a relevant youtube url and set it to param
+                const results = await ytsr(param);
+                param = results.items.find((item) => item.type === 'video').url;
+                const track = await mc.TrackMetadataFromYTUrl(param);
+                const trackPosition = subscription.getCurrPosition();
+                trackPlaylist.push(
+                    new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
+                );
 
-            mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+            } catch (error) {
+                console.log(error, '\n');
+            }
         }
 
         if (trackPlaylist.length == 0) {
