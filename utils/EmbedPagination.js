@@ -1,4 +1,5 @@
 const { MessageActionRow, MessageEmbed, MessageButton } = require('discord.js');
+const { response } = require('../responses/MusicCommandsResponse');
 
 /**
  * Creates a pagination embed
@@ -30,9 +31,13 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
         fetchReply: true,
     });
 
-    const filter = (i) =>
-        (i.customId === buttonList[0].customId || i.customId === buttonList[1].customId) &&
-        i.user === interaction.user;
+    const filter = (i) => {
+        const validId =
+            i.customId === buttonList[0].customId || i.customId === buttonList[1].customId;
+        if (validId && i.user === interaction.user) return true;
+        else if (validId) i.channel.send({ embeds: [response.filterMessage(i)] });
+        return false;
+    };
 
     const collector = await curPage.createMessageComponentCollector({
         filter,
