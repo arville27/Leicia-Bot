@@ -2,6 +2,7 @@ const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('dis
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const paginationEmbed = require('../../utils/EmbedPagination');
+const { response } = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('queue').setDescription('See the music queue'),
@@ -17,7 +18,7 @@ module.exports = {
 
         if (!subscription) {
             return await interaction.followUp({
-                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+                embeds: [response.noSubscriptionAvailable()],
             });
         }
 

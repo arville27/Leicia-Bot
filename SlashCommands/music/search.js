@@ -9,6 +9,7 @@ const {
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const ytsr = require('ytsr');
 const play = require('./play');
+const { response } = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -29,13 +30,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(
-                            ':octagonal_sign: **Join a voice channel and then try that again!**'
-                        )
-                        .setColor('#eb0000'),
-                ],
+                embeds: [response.notInVoiceChannel()],
             });
         }
 

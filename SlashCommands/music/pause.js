@@ -1,6 +1,7 @@
 const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
+const { response } = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -18,13 +19,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(
-                            ':octagonal_sign: **Join a voice channel and then try that again!**'
-                        )
-                        .setColor('#eb0000'),
-                ],
+                embeds: [response.notInVoiceChannel()],
             });
         }
 
@@ -32,19 +27,14 @@ module.exports = {
 
         if (!subscription) {
             return await interaction.followUp({
-                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+                embeds: [response.noSubscriptionAvailable()],
             });
         }
 
         // subscription.pause() will return true if current audioPlayer state is Playing
-        if (subscription.pause()) {
-            await interaction.followUp({
-                embeds: [new MessageEmbed().setDescription(':pause_button: **Paused!**')],
-            });
-        } else {
-            await interaction.followUp({
-                embeds: [new MessageEmbed().setDescription(':pause_button: **Already Paused!**')],
-            });
-        }
+        const state = subscription.pause();
+        await interaction.followUp({
+            embeds: [response.pauseAudioPlayer(state)],
+        });
     },
 };

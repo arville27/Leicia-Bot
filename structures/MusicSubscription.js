@@ -211,15 +211,6 @@ class MusicSubscription {
             this.audioPlayer.stop();
         }
     }
-    /**
-     * Adds a new Track to the queue.
-     *
-     * @param {Track} track The track to add to the queue
-     */
-    // enqueue(track) {
-    //     this.queue.push(track);
-    //     void this.processQueue();
-    // }
 
     /**
      * Adds a new Track to the queue.

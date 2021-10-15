@@ -1,6 +1,7 @@
 const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
+const { response } = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -21,13 +22,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(
-                            ':octagonal_sign: **Join a voice channel and then try that again!**'
-                        )
-                        .setColor('#eb0000'),
-                ],
+                embeds: [response.notInVoiceChannel()],
             });
         }
 
@@ -35,27 +30,20 @@ module.exports = {
 
         if (!subscription) {
             return await interaction.followUp({
-                content: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+                embeds: [response.noSubscriptionAvailable()],
             });
         }
 
-        // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
-        // listener defined in music/subscription.ts, transitions into the Idle state mean the next track from the queue
-        // will be loaded and played.
         const trackNumber = interaction.options.getInteger('no');
         if (trackNumber >= subscription.size || trackNumber < 1) {
             return await interaction.followUp({
-                content: ':diamond_shape_with_a_dot_inside:  Please provide a valid number',
+                embeds: [response.invalidTrackNumber()],
             });
         }
 
         subscription.changeTrack(trackNumber);
         await interaction.followUp({
-            embeds: [
-                new MessageEmbed()
-                    .setDescription(`:track_next: **Change to track no ${trackNumber}!**`)
-                    .setColor('#0070eb'),
-            ],
+            embeds: [response.successfulChangeTrack(trackNumber)],
         });
     },
 };

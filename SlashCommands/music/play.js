@@ -1,4 +1,4 @@
-const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('discord.js');
+const { Client, CommandInteraction, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
@@ -38,13 +38,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(
-                            ':octagonal_sign: **Join a voice channel and then try that again!**'
-                        )
-                        .setColor('#eb0000'),
-                ],
+                embeds: [response.notInVoiceChannel()],
             });
         }
 
@@ -61,13 +55,7 @@ module.exports = {
         } catch (error) {
             console.warn(error);
             return await interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription(
-                            ':octagonal_sign: **Failed to join voice channel within 20 seconds, please try again later!**'
-                        )
-                        .setColor('#eb0000'),
-                ],
+                embeds: [response.failedJoinVoiceChannel()],
             });
         }
 
