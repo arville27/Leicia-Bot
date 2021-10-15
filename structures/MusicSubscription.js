@@ -200,7 +200,7 @@ class MusicSubscription {
 
     changeTrack(index) {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Paused) {
-            this.current = index - 1;
+            this.current = index - 2;
             this.audioPlayer.stop();
             this.audioPlayer.unpause();
         } else if (this.audioPlayer.state.status === AudioPlayerStatus.Idle) {
