@@ -1,5 +1,6 @@
 const { MessageEmbed, CommandInteraction } = require('discord.js');
 const { TrackMetadata } = require('../structures/TrackMetadata');
+const { TrackMetadataFromYTUrl } = require('../utils/MusicCommands').mc;
 
 /**
  *
@@ -174,9 +175,24 @@ function selectMenuPrompt() {
     return new MessageEmbed().setDescription('**Select a song to play!**').setColor('#0070eb');
 }
 
-function selectedMenuMessage() {
+/**
+ *
+ * @param {String} url
+ */
+async function selectedMenuMessage(url) {
+    const trackMetadata = await TrackMetadataFromYTUrl(url);
     return new MessageEmbed()
-        .setDescription(':diamond_shape_with_a_dot_inside: Already selected')
+        .setDescription(`**Selected** [${trackMetadata.title}](${trackMetadata.url})`)
+        .setColor('#0070eb');
+}
+
+/**
+ *
+ * @param {Number} length in seconds
+ */
+function timeoutHasBeenReached(length) {
+    return new MessageEmbed()
+        .setDescription(`:diamond_shape_with_a_dot_inside: Expired after ${length} seconds`)
         .setColor('#0070eb');
 }
 
@@ -198,6 +214,7 @@ const response = {
     notInVoiceChannel,
     failedJoinVoiceChannel,
     noSubscriptionAvailable,
+    timeoutHasBeenReached,
     invalidTrackNumber,
     successfulChangeTrack,
     disconnectFromVoiceChannel,

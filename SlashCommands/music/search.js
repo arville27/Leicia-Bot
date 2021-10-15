@@ -77,7 +77,7 @@ module.exports = {
         const collector = interaction.channel.createMessageComponentCollector({
             filter,
             max: 1,
-            time: 30 * 1000,
+            time: 120 * 1000,
             componentType: 'SELECT_MENU',
         });
 
@@ -85,11 +85,15 @@ module.exports = {
             await play.run(client, componentInteraction, componentInteraction.values);
         });
 
-        collector.on('end', async () => {
+        collector.on('end', async (collections) => {
             if (!master.deleted) {
+                const res =
+                    collections.size > 0
+                        ? await response.selectedMenuMessage(collections.first().values[0])
+                        : response.timeoutHasBeenReached(120);
                 await master
                     .edit({
-                        embeds: [response.selectedMenuMessage()],
+                        embeds: [res],
                         components: [],
                     })
                     .catch(() => console.log('[ERROR] Select menu already deleted'));
