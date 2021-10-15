@@ -1,11 +1,11 @@
-const { MessageActionRow, MessageEmbed, MessageButton } = require('discord.js');
+const { MessageActionRow, MessageEmbed, MessageButton, CommandInteraction } = require('discord.js');
 const { response } = require('../responses/MusicCommandsResponse');
 const { promisify } = require('util');
 const wait = promisify(setTimeout);
 
 /**
  * Creates a pagination embed
- * @param {Interaction} interaction
+ * @param {CommandInteraction} interaction
  * @param {MessageEmbed[]} pages
  * @param {MessageButton[]} buttonList
  * @param {number} timeout
