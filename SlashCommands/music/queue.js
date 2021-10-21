@@ -33,7 +33,7 @@ module.exports = {
             const duration = track.duration;
             const url = track.url;
             return no
-                ? `\`「${number}」\` [${title}](${url}) ${duration}`
+                ? `\`${number}\` [${title}](${url}) ${duration}`
                 : `[${title}](${url}) ${duration}`;
         };
         let maxPage = Math.ceil(subscription.queue.length / 10);
