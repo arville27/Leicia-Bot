@@ -6,9 +6,8 @@ const {
     GuildMember,
 } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const ytsr = require('ytsr');
+const { search } = require('youtube-scrapper');
 const { response } = require('../../responses/MusicCommandsResponse');
-const { promisify } = require('util');
 const selectMenu = require('../../utils/EmbedSelectMenu');
 
 module.exports = {
@@ -35,16 +34,14 @@ module.exports = {
         }
 
         const terms = interaction.options.getString('terms');
-        const results = await ytsr(terms, { limit: 20 });
-        const listSong = results.items
-            .filter((item) => item.type === 'video')
-            .map((item) => {
-                return {
-                    label: item.title,
-                    description: `Channel: ${item.author.name}\t Duration: ${item.duration}`,
-                    value: item.url,
-                };
-            });
+        const results = await search(terms);
+        const listSong = results.videos.map((video) => {
+            return {
+                label: video.title,
+                description: `Channel: ${video.author.name}\t Duration: ${video.duration / 1000}`,
+                value: video.url,
+            };
+        });
 
         const row = new MessageActionRow().addComponents(
             new MessageSelectMenu()

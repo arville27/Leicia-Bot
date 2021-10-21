@@ -65,6 +65,7 @@ function playlistEmbed(interaction, playlistInfo) {
         })
         .setTimestamp();
     if (playlistInfo.thumbnail) embed.setThumbnail(playlistInfo.thumbnail);
+    if (playlistInfo.url) embed.setURL(playlistInfo.url);
     return embed;
 }
 

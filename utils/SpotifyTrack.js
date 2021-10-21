@@ -1,7 +1,6 @@
-const ytsr = require('ytsr');
 const { spotifyClientID, spotifyClientSecret } = require('../config.json');
 const { Spotify } = require('spotify-info.js');
-const { TrackMetadata } = require('../structures/TrackMetadata');
+const { trackMetadataFrom } = require('../utils/MusicCommands').mc;
 const spotify = new Spotify({
     clientID: spotifyClientID,
     clientSecret: spotifyClientSecret,
@@ -40,32 +39,6 @@ const whatIsIt = async (url) => {
         album: await isAlbum(url),
         playlist: await isPlaylist(url),
     };
-};
-
-const trackMetadataFrom = async (query) => {
-    const parseDuration = (duration) => {
-        const timePart = duration.split(':').map((x) => parseInt(x));
-        let length = 0;
-        if (timePart.length == 1) {
-            length += timePart[0];
-        } else if (timePart.length == 2) {
-            const [minute, second] = timePart;
-            length += minute * 60 + second;
-        } else if (timePart.length == 3) {
-            const [hour, minute, second] = timePart;
-            length += hour * 3600 + minute * 60 + second;
-        }
-        return length;
-    };
-
-    const res = await ytsr(query);
-    const info = res.items.find((item) => item.type === 'video');
-    return new TrackMetadata({
-        title: info.title,
-        url: info.url,
-        thumbnail: info.bestThumbnail.url,
-        length: parseDuration(info.duration),
-    });
 };
 
 const parsePlaylist = async (url) => {

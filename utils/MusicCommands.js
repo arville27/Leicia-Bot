@@ -1,8 +1,7 @@
 const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
-const { MusicSubscription } = require('../structures/MusicSubscription');
 const { joinVoiceChannel } = require('@discordjs/voice');
-const ytpl = require('ytpl');
-const { getInfo } = require('ytdl-core');
+const { getPlaylistInfo, getVideoInfo, search } = require('youtube-scrapper');
+const { MusicSubscription } = require('../structures/MusicSubscription');
 const { TrackMetadata } = require('../structures/TrackMetadata');
 const { matchUrlGroups } = require('../utils/Utility');
 
@@ -97,8 +96,13 @@ const trackInfoMethods = (interaction, trackMetadata, trackPosition) => {
 /**
  * @param {String} url
  */
-const isYTPlaylist = (url) => {
-    return ytpl.validateID(url);
+const isYTPlaylist = async (url) => {
+    try {
+        await getPlaylistInfo(url);
+        return true;
+    } catch (error) {
+        return false;
+    }
 };
 
 /**
@@ -112,25 +116,41 @@ const isUrl = (domains, url) => {
 };
 
 /**
+ *
+ * @param {string} query
+ */
+const trackMetadataFrom = async (query) => {
+    const res = await search(query);
+    if (!res.videos.length) throw 'No results found';
+    const video = res.videos[0];
+    return new TrackMetadata({
+        title: video.title,
+        url: video.url,
+        thumbnail: video.thumbnails[0].url,
+        length: video.duration / 1000,
+    });
+};
+
+/**
  * Creates a Track from a video URL and lifecycle callback methods.
  *
  * @param {String} url The URL of the video
  * @returns The created TrackMetadata
  */
 async function TrackMetadataFromYTUrl(url) {
-    const info = await getInfo(url)
-        .then((info) => info)
+    const video = await getVideoInfo(url)
+        .then((video) => video)
         .catch((err) => {
             console.log(`[ERROR] URL: ${url}\nCAUSE: ${err}`);
             return null;
         });
 
-    if (info) {
+    if (video) {
         return new TrackMetadata({
-            title: info.videoDetails.title,
+            title: video.details.title,
             url: url,
-            thumbnail: info.videoDetails.thumbnails[0].url,
-            length: info.videoDetails.lengthSeconds,
+            thumbnail: video.details.thumbnails[0].url,
+            length: video.details.duration / 1000,
         });
     }
 }
@@ -142,19 +162,21 @@ async function TrackMetadataFromYTUrl(url) {
  * @returns The created List of TrackMetadata
  */
 async function TrackMetadataFromYTPlaylist(playlistId) {
-    const rawInfo = await ytpl(playlistId);
+    const res = await getPlaylistInfo(playlistId);
+    const playlist = await res.fetch();
     const playlistInfo = {
-        playlistName: rawInfo.title,
-        count: rawInfo.estimatedItemCount,
-        thumbnail: rawInfo.bestThumbnail.url,
+        playlistName: playlist.title,
+        count: playlist.tracks.length,
+        url: playlist.url,
+        thumbnail: null,
     };
 
-    const trackList = rawInfo.items.map((info) => {
+    const trackList = playlist.tracks.map((video) => {
         const track = new TrackMetadata({
-            title: info.title,
-            url: info.shortUrl,
-            thumbnail: info.bestThumbnail.url,
-            length: info.durationSec,
+            title: video.title,
+            url: video.url,
+            thumbnail: video.thumbnails[0].url,
+            length: video.duration / 1000,
         });
 
         return track;
@@ -171,6 +193,7 @@ const mc = {
     trackInfoMethods,
     TrackMetadataFromYTPlaylist,
     TrackMetadataFromYTUrl,
+    trackMetadataFrom,
 };
 
 module.exports = { mc };

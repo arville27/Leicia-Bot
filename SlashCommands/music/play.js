@@ -2,7 +2,6 @@ const { Client, CommandInteraction, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
-const ytsr = require('ytsr');
 const { parsePlaylist, parseAlbum, parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
 const { isValidUrl } = require('../../utils/Utility');
 const { mc } = require('../../utils/MusicCommands');
@@ -121,7 +120,7 @@ module.exports = {
                     }
                 }
             } else if (mc.isUrl(['youtube'], param)) {
-                if (mc.isYTPlaylist(param)) {
+                if (await mc.isYTPlaylist(param)) {
                     try {
                         const { playlistInfo, trackList } = await mc.TrackMetadataFromYTPlaylist(
                             param
@@ -160,23 +159,9 @@ module.exports = {
             }
         } else {
             try {
-                // keyword as query
+                // param as query
                 // find a relevant youtube url and set it to param
-                const results = await ytsr(param);
-                const relevantItem = results.items.find((item) => item.type === 'video');
-
-                // if no item are relevant with user keyword, return no result found message
-                if (!relevantItem) {
-                    try {
-                        return await interaction.followUp({ embeds: [response.noResultsFound()] });
-                    } catch (error) {
-                        return await interaction.channel.send({
-                            embeds: [response.noResultsFound()],
-                        });
-                    }
-                }
-
-                const track = await mc.TrackMetadataFromYTUrl(relevantItem.url);
+                const track = await mc.trackMetadataFrom(param);
                 const trackPosition = subscription.getCurrPosition();
                 trackPlaylist.push(
                     new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
