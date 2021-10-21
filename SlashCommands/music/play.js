@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
 const ytsr = require('ytsr');
-const { parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
+const { parsePlaylist, parseAlbum, parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
 const { isValidUrl } = require('../../utils/Utility');
 const { mc } = require('../../utils/MusicCommands');
 const { response } = require('../../responses/MusicCommandsResponse');
@@ -67,8 +67,7 @@ module.exports = {
                 const type = await whatIsIt(param);
                 if (type.track) {
                     try {
-                        param = (await parseTrack(param)).url;
-                        const track = await mc.TrackMetadataFromYTUrl(param);
+                        const track = await parseTrack(param);
                         const trackPosition = subscription.getCurrPosition();
                         trackPlaylist.push(
                             new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
@@ -80,9 +79,7 @@ module.exports = {
                     }
                 } else if (type.album) {
                     try {
-                        const { playlistInfo, trackList } = await mc.TrackMetadatafromSpotifyAlbum(
-                            param
-                        );
+                        const { playlistInfo, trackList } = await parseAlbum(param);
 
                         trackList.forEach((track) => {
                             trackPlaylist.push(
@@ -103,8 +100,7 @@ module.exports = {
                     }
                 } else if (type.playlist) {
                     try {
-                        const { playlistInfo, trackList } =
-                            await mc.TrackMetadatafromSpotifyPlaylist(param);
+                        const { playlistInfo, trackList } = await parsePlaylist(param);
 
                         trackList.forEach((track) => {
                             trackPlaylist.push(

@@ -4,7 +4,6 @@ const { joinVoiceChannel } = require('@discordjs/voice');
 const ytpl = require('ytpl');
 const { getInfo } = require('ytdl-core');
 const { TrackMetadata } = require('../structures/TrackMetadata');
-const { parsePlaylist, parseAlbum } = require('../utils/SpotifyTrack');
 const { matchUrlGroups } = require('../utils/Utility');
 
 /**
@@ -119,14 +118,21 @@ const isUrl = (domains, url) => {
  * @returns The created TrackMetadata
  */
 async function TrackMetadataFromYTUrl(url) {
-    const info = await getInfo(url);
+    const info = await getInfo(url)
+        .then((info) => info)
+        .catch((err) => {
+            console.log(`[ERROR] URL: ${url}\nCAUSE: ${err}`);
+            return null;
+        });
 
-    return new TrackMetadata({
-        title: info.videoDetails.title,
-        url: url,
-        thumbnail: info.videoDetails.thumbnails[0].url,
-        length: info.videoDetails.lengthSeconds,
-    });
+    if (info) {
+        return new TrackMetadata({
+            title: info.videoDetails.title,
+            url: url,
+            thumbnail: info.videoDetails.thumbnails[0].url,
+            length: info.videoDetails.lengthSeconds,
+        });
+    }
 }
 
 /**
@@ -157,42 +163,6 @@ async function TrackMetadataFromYTPlaylist(playlistId) {
     return { playlistInfo, trackList };
 }
 
-/**
- * Creates a Track from a video URL and lifecycle callback methods.
- *
- * @param {String} playlistId The URL of the playlist
- * @returns The created List of TrackMetadata
- */
-async function TrackMetadatafromSpotifyPlaylist(playlistId) {
-    const { playlistName, items } = await parsePlaylist(playlistId);
-    const playlistInfo = {
-        playlistName: playlistName,
-        count: items.length,
-        thumbnail: null,
-    };
-    let trackList = items.map((url) => TrackMetadataFromYTUrl(url));
-    trackList = await Promise.all(trackList);
-    return { playlistInfo, trackList };
-}
-
-/**
- * Creates a Track from a video URL and lifecycle callback methods.
- *
- * @param {String} albumId The URL of the album
- * @returns The created List of TrackMetadata
- */
-async function TrackMetadatafromSpotifyAlbum(albumId) {
-    const { albumName, artists, items } = await parseAlbum(albumId);
-    const playlistInfo = {
-        playlistName: `${artists} - ${albumName}`,
-        count: items.length,
-        thumbnail: null,
-    };
-    let trackList = items.map((url) => TrackMetadataFromYTUrl(url));
-    trackList = await Promise.all(trackList);
-    return { playlistInfo, trackList };
-}
-
 const mc = {
     getGuildSubscription,
     createSubscription,
@@ -201,8 +171,6 @@ const mc = {
     trackInfoMethods,
     TrackMetadataFromYTPlaylist,
     TrackMetadataFromYTUrl,
-    TrackMetadatafromSpotifyPlaylist,
-    TrackMetadatafromSpotifyAlbum,
 };
 
 module.exports = { mc };
