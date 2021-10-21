@@ -1,7 +1,7 @@
 const { createAudioResource, demuxProbe } = require('@discordjs/voice');
 const { raw } = require('youtube-dl-exec');
 const { TrackMetadata } = require('./TrackMetadata');
-
+const { ytCookies } = require('../config.json');
 /**
  * A Track represents information about a YouTube video (in this context) that can be added to a queue.
  * It contains the title and URL of the video, as well as functions onStart, onFinish, onError, that act
@@ -31,17 +31,19 @@ class Track {
      * Creates an AudioResource from this Track.
      */
     createAudioResource() {
+        const flags = {
+            o: '-',
+            q: '',
+            f: 'bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio',
+            r: '100K',
+        };
+
+        if (ytCookies) {
+            flags.cookies = ytCookies;
+        }
+
         return new Promise((resolve, reject) => {
-            const process = raw(
-                this.url,
-                {
-                    o: '-',
-                    q: '',
-                    f: 'bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio',
-                    r: '100K',
-                },
-                { stdio: ['ignore', 'pipe', 'ignore'] }
-            );
+            const process = raw(this.url, flags, { stdio: ['ignore', 'pipe', 'ignore'] });
             if (!process.stdout) {
                 reject(new Error('No stdout'));
                 return;
