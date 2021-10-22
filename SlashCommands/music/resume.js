@@ -1,4 +1,4 @@
-const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
+const { Client, CommandInteraction, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const { response } = require('../../responses/MusicCommandsResponse');
