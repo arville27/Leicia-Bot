@@ -31,7 +31,7 @@ module.exports = async (client) => {
     const slashCommands = await globPromise(`${process.cwd()}/SlashCommands/*/*.js`);
 
     const arrayOfSlashCommands = [];
-    slashCommands.map((value) => {
+    slashCommands.forEach((value) => {
         const file = require(value);
         if (!file?.name) return;
         console.log(`${file.name} command loaded`);

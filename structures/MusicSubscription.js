@@ -28,6 +28,7 @@ class MusicSubscription {
         this.voiceConnection = voiceConnection;
         this.audioPlayer = createAudioPlayer();
         this.queue = [];
+        this.loop = { queue: false, song: false };
 
         this.voiceConnection.on('stateChange', async (_, newState) => {
             if (newState.status === VoiceConnectionStatus.Disconnected) {
@@ -101,7 +102,11 @@ class MusicSubscription {
             ) {
                 // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                 // The queue is then processed to start playing the next track, if one is available.
-                this.current++;
+                if (this.loop.queue) {
+                    this.current = !this.queue.at(this.current + 1) ? 0 : this.current + 1;
+                } else if (!this.loop.song) {
+                    this.current++;
+                }
                 if (!this.queue.at(this.current) && !this.destroyed) {
                     oldState.resource.metadata.onFinish();
                     this.leave = true;
@@ -174,26 +179,30 @@ class MusicSubscription {
 
     skip() {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Paused) {
+            if (this.loop.song) this.current++;
             this.audioPlayer.stop();
             this.audioPlayer.unpause();
         } else if (this.audioPlayer.state.status === AudioPlayerStatus.Idle) {
             this.current++;
             this.processQueue();
         } else {
+            if (this.loop.song) this.current++;
             this.audioPlayer.stop();
         }
     }
 
     prev() {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Paused) {
-            this.current -= 2;
+            if (this.loop.song) this.current--;
+            else this.current -= 2;
             this.audioPlayer.stop();
             this.audioPlayer.unpause();
         } else if (this.audioPlayer.state.status === AudioPlayerStatus.Idle) {
             this.current -= 1;
             this.processQueue();
         } else {
-            this.current -= 2;
+            if (this.loop.song) this.current--;
+            else this.current -= 2;
             this.audioPlayer.stop();
         }
     }
