@@ -233,7 +233,8 @@ class MusicSubscription {
             this.current = index - 1;
             this.processQueue();
         } else {
-            this.current = index - 2;
+            if (this.loop.song) this.current = index - 2;
+            else this.current = index - 1;
             this.audioPlayer.stop();
         }
     }
