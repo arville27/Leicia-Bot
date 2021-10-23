@@ -148,7 +148,7 @@ async function TrackMetadataFromYTUrl(url) {
     if (video) {
         return new TrackMetadata({
             title: video.details.title,
-            url: url,
+            url: video.details.url,
             thumbnail: video.details.thumbnails[0].url,
             length: video.details.duration / 1000,
         });
