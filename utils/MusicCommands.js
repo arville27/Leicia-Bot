@@ -43,9 +43,8 @@ const createSubscription = (client, interaction) => {
 /**
  * @param {CommandInteraction} interaction
  * @param {TrackMetadata} trackMetadata
- * @param {Number} trackPosition
  */
-const trackInfoMethods = (subscription, interaction, trackMetadata, trackPosition) => {
+const trackInfoMethods = (subscription, interaction, trackMetadata) => {
     return {
         onStart: async () => {
             if (!subscription.announce) return;

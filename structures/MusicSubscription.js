@@ -19,7 +19,6 @@ class MusicSubscription {
      */
     constructor(voiceConnection) {
         this.current = 0;
-        this.size = 1;
         this.leave = false;
         this.destroyed = false;
         this.queueLock = false;
@@ -174,10 +173,6 @@ class MusicSubscription {
         return this.queue[this.current];
     }
 
-    getCurrSize() {
-        return this.size++;
-    }
-
     pause() {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
             this.audioPlayer.pause();
@@ -256,7 +251,6 @@ class MusicSubscription {
      */
     stop() {
         this.current = 0;
-        this.size = 1;
         this.queueLock = true;
         this.queue = [];
         this.announce = true;

@@ -35,7 +35,7 @@ module.exports = {
         }
 
         const trackNumber = interaction.options.getInteger('no');
-        if (trackNumber >= subscription.size || trackNumber < 1) {
+        if (trackNumber > subscription.queue.length || trackNumber < 1) {
             return await interaction.followUp({
                 embeds: [response.invalidTrackNumber()],
             });

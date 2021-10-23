@@ -67,15 +67,15 @@ module.exports = {
                 if (type.track) {
                     try {
                         const track = await parseTrack(param);
-                        const trackPosition = subscription.getCurrSize();
                         trackPlaylist.push(
-                            new Track(
-                                track,
-                                mc.trackInfoMethods(subscription, interaction, track, trackPosition)
-                            )
+                            new Track(track, mc.trackInfoMethods(subscription, interaction, track))
                         );
 
-                        mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                        mediaInfo = response.singleTrackEmbed(
+                            interaction,
+                            track,
+                            subscription.queue.length + 1
+                        );
                     } catch (error) {
                         console.log(error, '\n');
                     }
@@ -87,12 +87,7 @@ module.exports = {
                             trackPlaylist.push(
                                 new Track(
                                     track,
-                                    mc.trackInfoMethods(
-                                        subscription,
-                                        interaction,
-                                        track,
-                                        subscription.getCurrSize()
-                                    )
+                                    mc.trackInfoMethods(subscription, interaction, track)
                                 )
                             );
                         });
@@ -109,12 +104,7 @@ module.exports = {
                             trackPlaylist.push(
                                 new Track(
                                     track,
-                                    mc.trackInfoMethods(
-                                        subscription,
-                                        interaction,
-                                        track,
-                                        subscription.getCurrSize()
-                                    )
+                                    mc.trackInfoMethods(subscription, interaction, track)
                                 )
                             );
                         });
@@ -135,12 +125,7 @@ module.exports = {
                             trackPlaylist.push(
                                 new Track(
                                     track,
-                                    mc.trackInfoMethods(
-                                        subscription,
-                                        interaction,
-                                        track,
-                                        subscription.getCurrSize()
-                                    )
+                                    mc.trackInfoMethods(subscription, interaction, track)
                                 )
                             );
                         });
@@ -152,15 +137,15 @@ module.exports = {
                 } else {
                     try {
                         const track = await mc.TrackMetadataFromYTUrl(param);
-                        const trackPosition = subscription.getCurrSize();
                         trackPlaylist.push(
-                            new Track(
-                                track,
-                                mc.trackInfoMethods(subscription, interaction, track, trackPosition)
-                            )
+                            new Track(track, mc.trackInfoMethods(subscription, interaction, track))
                         );
 
-                        mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                        mediaInfo = response.singleTrackEmbed(
+                            interaction,
+                            track,
+                            subscription.queue.length + 1
+                        );
                     } catch (error) {
                         console.log(error, '\n');
                     }
@@ -171,15 +156,15 @@ module.exports = {
                 // param as query
                 // find a relevant youtube url and set it to param
                 const track = await mc.trackMetadataFrom(param);
-                const trackPosition = subscription.getCurrSize();
                 trackPlaylist.push(
-                    new Track(
-                        track,
-                        mc.trackInfoMethods(subscription, interaction, track, trackPosition)
-                    )
+                    new Track(track, mc.trackInfoMethods(subscription, interaction, track))
                 );
 
-                mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
+                mediaInfo = response.singleTrackEmbed(
+                    interaction,
+                    track,
+                    subscription.queue.length + 1
+                );
             } catch (error) {
                 console.log(error, '\n');
             }
