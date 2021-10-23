@@ -1,5 +1,5 @@
 const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, bold } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const { response } = require('../../responses/MusicCommandsResponse');
 
@@ -46,12 +46,13 @@ module.exports = {
         let embed;
         if (option === 'song' && !queue) {
             subscription.loop = { queue: queue, song: !song };
-            embed = new MessageEmbed().setDescription(`Loop track: ${!song ? 'ON' : 'OFF'}`);
+            embed = new MessageEmbed().setDescription(bold(`Loop track: ${!song ? 'ON' : 'OFF'}`));
         } else if (option === 'queue' && !song) {
             subscription.loop = { queue: !queue, song: song };
-            embed = new MessageEmbed().setDescription(`Loop quueue: ${!queue ? 'ON' : 'OFF'}`);
+            embed = new MessageEmbed().setDescription(bold(`Loop queue: ${!queue ? 'ON' : 'OFF'}`));
         } else {
-            return await interaction.followUp('Thats illegal');
+            embed = new MessageEmbed().setDescription(`:x: ${bold('Wait, thats illegal!')}`);
+            return await interaction.followUp({ embeds: [embed] });
         }
         await interaction.followUp({ embeds: [embed] });
     },
