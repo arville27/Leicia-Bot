@@ -1,5 +1,5 @@
 const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, bold, inlineCode } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const paginationEmbed = require('../../utils/EmbedPagination');
 const { response } = require('../../responses/MusicCommandsResponse');
@@ -33,9 +33,10 @@ module.exports = {
             const duration = track.duration;
             const url = track.url;
             return no
-                ? `\`${number}\` [${title}](${url}) ${duration}`
+                ? `${inlineCode(number)} [${title}](${url}) ${duration}`
                 : `[${title}](${url}) ${duration}`;
         };
+
         let maxPage = Math.ceil(subscription.queue.length / 10);
         const trackInfo = [];
         for (let i = 0; i < maxPage; i++) {
@@ -49,15 +50,19 @@ module.exports = {
             );
         }
 
-        const currTrack = subscription.getCurrentTrack();
-        const currTrackInfo = currTrack
-            ? generateTrackInfo(null, currTrack)
-            : 'Currently not playing';
+        const { index, track } = subscription.getCurrentTrack();
+        const currTrackInfo = track
+            ? generateTrackInfo(null, track)
+            : bold('Currently not playing');
+
         const pages = trackInfo.map((list) => {
             return new MessageEmbed()
                 .setColor('#93C5F7')
                 .setTitle(`Music Queue (${subscription.queue.length} tracks)`)
-                .addField('Now Playing', `${currTrackInfo}\n\n${list}`);
+                .addField(
+                    `Now Playing ${inlineCode(`(Track ${index + 1})`)}`,
+                    `${currTrackInfo}\n\n${list}`
+                );
         });
 
         //create an array of buttons

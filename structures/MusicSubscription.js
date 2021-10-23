@@ -170,7 +170,7 @@ class MusicSubscription {
     }
 
     getCurrentTrack() {
-        return this.queue[this.current];
+        return { index: this.current, track: this.queue[this.current] };
     }
 
     pause() {
