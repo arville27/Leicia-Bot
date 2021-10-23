@@ -29,6 +29,7 @@ class MusicSubscription {
         this.audioPlayer = createAudioPlayer();
         this.queue = [];
         this.loop = { queue: false, song: false };
+        this.announce = true;
 
         this.voiceConnection.on('stateChange', async (_, newState) => {
             if (newState.status === VoiceConnectionStatus.Disconnected) {
@@ -241,6 +242,7 @@ class MusicSubscription {
         this.size = 1;
         this.queueLock = true;
         this.queue = [];
+        this.announce = true;
         this.audioPlayer.stop(true);
     }
 

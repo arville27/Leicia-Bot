@@ -69,7 +69,10 @@ module.exports = {
                         const track = await parseTrack(param);
                         const trackPosition = subscription.getCurrPosition();
                         trackPlaylist.push(
-                            new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
+                            new Track(
+                                track,
+                                mc.trackInfoMethods(subscription, interaction, track, trackPosition)
+                            )
                         );
 
                         mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
@@ -85,6 +88,7 @@ module.exports = {
                                 new Track(
                                     track,
                                     mc.trackInfoMethods(
+                                        subscription,
                                         interaction,
                                         track,
                                         subscription.getCurrPosition()
@@ -106,6 +110,7 @@ module.exports = {
                                 new Track(
                                     track,
                                     mc.trackInfoMethods(
+                                        subscription,
                                         interaction,
                                         track,
                                         subscription.getCurrPosition()
@@ -131,6 +136,7 @@ module.exports = {
                                 new Track(
                                     track,
                                     mc.trackInfoMethods(
+                                        subscription,
                                         interaction,
                                         track,
                                         subscription.getCurrPosition()
@@ -148,7 +154,10 @@ module.exports = {
                         const track = await mc.TrackMetadataFromYTUrl(param);
                         const trackPosition = subscription.getCurrPosition();
                         trackPlaylist.push(
-                            new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
+                            new Track(
+                                track,
+                                mc.trackInfoMethods(subscription, interaction, track, trackPosition)
+                            )
                         );
 
                         mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);
@@ -164,7 +173,10 @@ module.exports = {
                 const track = await mc.trackMetadataFrom(param);
                 const trackPosition = subscription.getCurrPosition();
                 trackPlaylist.push(
-                    new Track(track, mc.trackInfoMethods(interaction, track, trackPosition))
+                    new Track(
+                        track,
+                        mc.trackInfoMethods(subscription, interaction, track, trackPosition)
+                    )
                 );
 
                 mediaInfo = response.singleTrackEmbed(interaction, track, trackPosition);

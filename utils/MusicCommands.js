@@ -45,9 +45,10 @@ const createSubscription = (client, interaction) => {
  * @param {TrackMetadata} trackMetadata
  * @param {Number} trackPosition
  */
-const trackInfoMethods = (interaction, trackMetadata, trackPosition) => {
+const trackInfoMethods = (subscription, interaction, trackMetadata, trackPosition) => {
     return {
         onStart: async () => {
+            if (!subscription.announce) return;
             const trackInfo = new MessageEmbed()
                 .setColor('#00eb55')
                 .setTitle(trackMetadata.title)
