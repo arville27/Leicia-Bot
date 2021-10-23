@@ -63,7 +63,7 @@ const trackInfoMethods = (subscription, interaction, trackMetadata, trackPositio
                     },
                     {
                         name: 'Queue Position',
-                        value: `Track ${trackPosition}`,
+                        value: `Track ${subscription.current + 1}`,
                         inline: true,
                     }
                 )

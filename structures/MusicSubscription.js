@@ -154,11 +154,27 @@ class MusicSubscription {
         voiceConnection.subscribe(this.audioPlayer);
     }
 
+    shuffle() {
+        this.queueLock = true;
+        const size = this.queue.length;
+        let currPlay = this.current;
+        for (let i = 0; i < size; i++) {
+            const a = Math.floor(Math.random() * size);
+            const b = Math.floor(Math.random() * size);
+            if (a === currPlay) currPlay = b;
+            else if (b === currPlay) currPlay = a;
+            [this.queue[a], this.queue[b]] = [this.queue[b], this.queue[a]];
+        }
+        [this.queue[0], this.queue[currPlay]] = [this.queue[currPlay], this.queue[0]];
+        this.current = 0;
+        this.queueLock = false;
+    }
+
     getCurrentTrack() {
         return this.queue[this.current];
     }
 
-    getCurrPosition() {
+    getCurrSize() {
         return this.size++;
     }
 
