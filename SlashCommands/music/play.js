@@ -114,7 +114,7 @@ module.exports = {
                         console.log(error, '\n');
                     }
                 }
-            } else if (mc.isUrl(['youtube'], param)) {
+            } else if (mc.isUrl(['youtube', 'youtu'], param)) {
                 if (await mc.isYTPlaylist(param)) {
                     try {
                         const { playlistInfo, trackList } = await mc.TrackMetadataFromYTPlaylist(
