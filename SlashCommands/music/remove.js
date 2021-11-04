@@ -69,7 +69,7 @@ module.exports = {
             }
         }
 
-        const { _, track } = subscription.getCurrentTrack();
+        const track = subscription.queue.at(trackNumber - 1);
 
         subscription.removeTrack(trackNumber);
 
