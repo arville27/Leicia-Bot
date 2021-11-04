@@ -1,6 +1,5 @@
 const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { AudioPlayerStatus } = require('@discordjs/voice');
+const { SlashCommandBuilder, bold, hyperlink } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const { response } = require('../../responses/MusicCommandsResponse');
 
@@ -37,38 +36,54 @@ module.exports = {
 
         const trackNumber = interaction.options.getInteger('no');
         if (trackNumber > subscription.queue.length) {
+            const embed = new MessageEmbed()
+                .setColor('#eb0000')
+                .setDescription(
+                    `${bold('Invalid track number')}\nNumbers of song in the queue (${
+                        subscription.queue.length
+                    }), you provide ${trackNumber}`
+                );
             try {
                 return await interaction.followUp({
-                    embeds: [
-                        new MessageEmbed().setDescription(
-                            `Max: ${subscription.queue.length}, you provide ${trackNumber}`
-                        ),
-                    ],
+                    embeds: [embed],
                 });
             } catch (error) {
                 return await interaction.channel.send({
-                    embeds: [
-                        new MessageEmbed().setDescription(
-                            `Max: ${subscription.queue.length}, you provide ${trackNumber}`
-                        ),
-                    ],
+                    embeds: [embed],
                 });
             }
         } else if (trackNumber <= 0) {
+            const embed = new MessageEmbed()
+                .setColor('#eb0000')
+                .setDescription(
+                    `${bold('Invalid track number')}\nTrack number must be more than 0`
+                );
             try {
                 return await interaction.followUp({
-                    embeds: [new MessageEmbed().setDescription(`You dumb`)],
+                    embeds: [embed],
                 });
             } catch (error) {
                 return await interaction.channel.send({
-                    embeds: [new MessageEmbed().setDescription(`You dumb`)],
+                    embeds: [embed],
                 });
             }
         }
 
+        const { _, track } = subscription.getCurrentTrack();
+
         subscription.removeTrack(trackNumber);
-        await interaction.followUp({
-            embeds: [new MessageEmbed().setDescription(`Get: ${trackNumber}`)],
-        });
+
+        const embed = new MessageEmbed()
+            .setColor('#0070eb')
+            .setDescription(`${bold('Successfully remove')} ${hyperlink(track.title, track.url)}`);
+        try {
+            return await interaction.followUp({
+                embeds: [embed],
+            });
+        } catch (error) {
+            return await interaction.channel.send({
+                embeds: [embed],
+            });
+        }
     },
 };
