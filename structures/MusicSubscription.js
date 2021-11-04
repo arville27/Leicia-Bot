@@ -169,6 +169,24 @@ class MusicSubscription {
         this.queueLock = false;
     }
 
+    removeTrack(trackNumber) {
+        this.queue = this.queue.filter((_, i) => i !== trackNumber - 1);
+
+        if (
+            trackNumber - 1 === this.current &&
+            this.audioPlayer.state.status === AudioPlayerStatus.Playing
+        ) {
+            this.current--;
+            this.skip();
+        } else if (
+            trackNumber - 1 === this.current &&
+            this.audioPlayer.state.status === AudioPlayerStatus.Paused
+        ) {
+            this.skip();
+            this.current--;
+        } else if (trackNumber - 1 <= this.current) this.current--;
+    }
+
     getCurrentTrack() {
         return { index: this.current, track: this.queue[this.current] };
     }
