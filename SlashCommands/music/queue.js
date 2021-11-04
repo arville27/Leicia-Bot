@@ -60,7 +60,9 @@ module.exports = {
                 .setColor('#93C5F7')
                 .setTitle(`Music Queue (${subscription.queue.length} tracks)`)
                 .addField(
-                    `Now Playing ${inlineCode(`(Track ${index + 1})`)}`,
+                    track
+                        ? `Now Playing ${inlineCode(`(Track ${index + 1})`)}`
+                        : `At the end of the queue`,
                     `${currTrackInfo}\n\n${list}`
                 );
         });
