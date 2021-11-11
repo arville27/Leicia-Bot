@@ -1,7 +1,8 @@
-const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
+const { Client, CommandInteraction, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
-const { response } = require('../../responses/MusicCommandsResponse');
+const { embedResponse } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -17,12 +18,12 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: false });
+        await interaction.deferReply();
 
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [response.notInVoiceChannel()],
+                embeds: [embedResponse(resp.others.notInVoiceChannel)],
             });
         }
 
@@ -30,20 +31,20 @@ module.exports = {
 
         if (!subscription) {
             return await interaction.followUp({
-                embeds: [response.noSubscriptionAvailable()],
+                embeds: [embedResponse(resp.others.noSubscriptionAvailable)],
             });
         }
 
         const trackNumber = interaction.options.getInteger('no');
         if (trackNumber > subscription.queue.length || trackNumber < 1) {
             return await interaction.followUp({
-                embeds: [response.invalidTrackNumber()],
+                embeds: [embedResponse(resp.others.invalidTrackNumber)],
             });
         }
 
         subscription.changeTrack(trackNumber);
         await interaction.followUp({
-            embeds: [response.successfulChangeTrack(trackNumber)],
+            embeds: [resp.successfulChangeTrack(trackNumber)],
         });
     },
 };

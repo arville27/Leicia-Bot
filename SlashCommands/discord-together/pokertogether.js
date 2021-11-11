@@ -1,6 +1,7 @@
 const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { response } = require('../../responses/MusicCommandsResponse');
+const { embedResponse } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('pokertogether').setDescription('Play poker with friends'),
@@ -16,7 +17,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [response.notInVoiceChannel()],
+                embeds: [embedResponse(resp.others.notInVoiceChannel)],
             });
         }
 

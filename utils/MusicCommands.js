@@ -3,8 +3,6 @@ const { joinVoiceChannel } = require('@discordjs/voice');
 const { getPlaylistInfo, getVideoInfo, search } = require('youtube-scrapper');
 const { MusicSubscription } = require('../structures/MusicSubscription');
 const { TrackMetadata } = require('../structures/TrackMetadata');
-const { matchUrlGroups } = require('../utils/Utility');
-const { Track } = require('../structures/Track');
 
 /**
  *
@@ -58,7 +56,7 @@ const trackInfoMethods = (subscription, interaction, trackMetadata) => {
                 .addFields(
                     {
                         name: 'Song Duration',
-                        value: Track.getTrackDuration(trackMetadata.length),
+                        value: trackMetadata.length,
                         inline: true,
                     },
                     {
@@ -104,16 +102,6 @@ const isYTPlaylist = async (url) => {
     } catch (error) {
         return false;
     }
-};
-
-/**
- * @param {String[]} domains
- * @param {String} url
- */
-const isUrl = (domains, url) => {
-    return matchUrlGroups(url).some((term) => {
-        return domains.find((domain) => domain === term);
-    });
 };
 
 /**
@@ -190,7 +178,6 @@ const mc = {
     getGuildSubscription,
     createSubscription,
     isYTPlaylist,
-    isUrl,
     trackInfoMethods,
     TrackMetadataFromYTPlaylist,
     TrackMetadataFromYTUrl,

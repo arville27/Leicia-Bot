@@ -2,7 +2,7 @@ const { glob } = require('glob');
 const { promisify } = require('util');
 const { Client } = require('discord.js');
 const mongoose = require('mongoose');
-const { mongooseConnectionString, guildsId } = require('../config.json');
+const { mongooseConnectionString, mongoUser, mongoPass, guildsId } = require('../config.json');
 
 const globPromise = promisify(glob);
 
@@ -101,5 +101,12 @@ module.exports = async (client) => {
     // mongoose
     if (!mongooseConnectionString) return;
 
-    mongoose.connect(mongooseConnectionString).then(() => console.log('Connected to mongodb'));
+    const auth = {
+        authSource: 'admin',
+        user: mongoUser,
+        pass: mongoPass,
+    };
+    mongoose
+        .connect(mongooseConnectionString, auth)
+        .then(() => console.log('Connected to mongodb'));
 };

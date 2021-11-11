@@ -1,5 +1,6 @@
 const { MessageButton, MessageActionRow, CommandInteraction } = require('discord.js');
-const { response } = require('../responses/MusicCommandsResponse');
+const resp = require('../responses/MusicCommandsResponse');
+const { embedResponse } = require('../utils/Utility');
 const { promisify } = require('util');
 const wait = promisify(setTimeout);
 const play = require('../SlashCommands/music/play');
@@ -19,7 +20,7 @@ const selectMenu = async (client, interaction, row) => {
     }
 
     const master = await interaction.editReply({
-        embeds: [response.selectMenuPrompt()],
+        embeds: [embedResponse(resp.others.selectMenuPrompt)],
         components: [row],
         fetchReply: true,
     });
@@ -28,7 +29,7 @@ const selectMenu = async (client, interaction, row) => {
     const filter = (componentInteraction) => {
         if (componentInteraction.user.id === interaction.user.id) return true;
         interaction.channel
-            .send({ embeds: [response.filterMessage(interaction)] })
+            .send({ embeds: [resp.filterMessage(interaction)] })
             .then(async (msg) => {
                 await wait(8_000);
                 msg.delete();
@@ -51,8 +52,8 @@ const selectMenu = async (client, interaction, row) => {
         if (!master.deleted) {
             const res =
                 collections.size > 0
-                    ? await response.selectedMenuMessage(collections.first().values[0])
-                    : response.timeoutHasBeenReached(120);
+                    ? await resp.selectedMenuMessage(collections.first().values[0])
+                    : resp.timeoutHasBeenReached(120);
             await master
                 .edit({
                     embeds: [res],

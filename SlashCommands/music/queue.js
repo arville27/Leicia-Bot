@@ -2,7 +2,8 @@ const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('dis
 const { SlashCommandBuilder, bold, inlineCode } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const paginationEmbed = require('../../utils/EmbedPagination');
-const { response } = require('../../responses/MusicCommandsResponse');
+const { embedResponse } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('queue').setDescription('See the music queue'),
@@ -18,19 +19,19 @@ module.exports = {
 
         if (!subscription) {
             return await interaction.followUp({
-                embeds: [response.noSubscriptionAvailable()],
+                embeds: [embedResponse(resp.others.noSubscriptionAvailable)],
             });
         } else if (subscription && subscription.queue.length == 0) {
             // subscription is created, by the queue is empty
             return await interaction.followUp({
-                embeds: [response.queueIsEmpty()],
+                embeds: [embedResponse(resp.others.queueIsEmpty)],
             });
         }
 
         const generateTrackInfo = (no, track) => {
             const number = `${no}`.padStart(2, 0);
             const title = `${track.title.substr(0, 30)}${track.title.length > 30 ? '...' : ''}`;
-            const duration = track.duration;
+            const duration = track.length;
             const url = track.url;
             return no
                 ? `${inlineCode(number)} [${title}](${url}) ${duration}`
@@ -53,7 +54,7 @@ module.exports = {
         const { index, track } = subscription.getCurrentTrack();
         const currTrackInfo = track
             ? generateTrackInfo(null, track)
-            : bold('Currently not playing');
+            : bold('**Currently not playing**');
 
         const pages = trackInfo.map((list) => {
             return new MessageEmbed()

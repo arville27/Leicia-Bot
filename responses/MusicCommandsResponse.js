@@ -1,7 +1,7 @@
 const { MessageEmbed, CommandInteraction } = require('discord.js');
+const { bold } = require('@discordjs/builders');
 const { TrackMetadata } = require('../structures/TrackMetadata');
 const { TrackMetadataFromYTUrl } = require('../utils/MusicCommands').mc;
-const { Track } = require('../structures/Track');
 
 /**
  *
@@ -19,7 +19,7 @@ function singleTrackEmbed(interaction, trackMetadata, trackPosition) {
         .addFields(
             {
                 name: 'Song Duration',
-                value: Track.getTrackDuration(trackMetadata.length),
+                value: trackMetadata.length,
                 inline: true,
             },
             {
@@ -29,25 +29,6 @@ function singleTrackEmbed(interaction, trackMetadata, trackPosition) {
             }
         )
         .setTimestamp();
-}
-
-/**
- * @typedef {{playlistName: string, count: number, thumbnail: string}} playlistInfo
- * @param {CommandInteraction} interaction
- * @param {playlistInfo} playlistInfo
- */
-function albumEmbed(interaction, playlistInfo) {
-    const embed = new MessageEmbed()
-        .setColor('#c99fff')
-        .setTitle(playlistInfo.playlistName)
-        .setAuthor('Album added to queue', interaction.user.avatarURL())
-        .addFields({
-            name: 'Added to queue',
-            value: `${playlistInfo.count}`,
-        })
-        .setTimestamp();
-    if (playlistInfo.thumbnail) embed.setThumbnail(playlistInfo.thumbnail);
-    return embed;
 }
 
 /**
@@ -71,56 +52,6 @@ function playlistEmbed(interaction, playlistInfo) {
 }
 
 /**
- * @typedef {{playlistName: string, count: number, thumbnail: string}} playlistInfo
- * @param {CommandInteraction} interaction
- * @param {playlistInfo} playlistInfo
- */
-function failedCreateTrack() {
-    return new MessageEmbed()
-        .setDescription(':octagonal_sign: **Failed to add track, please try again later!**')
-        .setColor('#eb0000');
-}
-
-function notInVoiceChannel() {
-    return new MessageEmbed()
-        .setDescription(':octagonal_sign: **Join a voice channel and then try that again!**')
-        .setColor('#eb0000');
-}
-
-function failedJoinVoiceChannel() {
-    return new MessageEmbed()
-        .setDescription(
-            ':octagonal_sign: **Failed to join voice channel within 20 seconds, please try again later!**'
-        )
-        .setColor('#eb0000');
-}
-
-function noSubscriptionAvailable() {
-    return new MessageEmbed()
-        .setDescription(':diamond_shape_with_a_dot_inside:  Currently not playing in this server!')
-        .setColor('#eb0000');
-}
-
-function firstTrackInSubscription() {
-    return new MessageEmbed()
-        .setDescription(':diamond_shape_with_a_dot_inside:  This is the first track in the queue')
-        .setColor('#eb0000');
-}
-
-function invalidTrackNumber() {
-    return new MessageEmbed()
-        .setDescription(':diamond_shape_with_a_dot_inside:  Please provide a valid number')
-        .setColor('#eb0000');
-}
-
-function lastTrackInQueue() {
-    return new MessageEmbed()
-        .setDescription(':diamond_shape_with_a_dot_inside:  The queue is already ended')
-        .setColor('#eb0000');
-}
-
-/**
- *
  * @param {Number} trackNumber
  */
 function successfulChangeTrack(trackNumber) {
@@ -129,20 +60,8 @@ function successfulChangeTrack(trackNumber) {
         .setColor('#0070eb');
 }
 
-function disconnectFromVoiceChannel() {
-    return new MessageEmbed()
-        .setDescription(':small_red_triangle: **Disconnected from channel!**')
-        .setColor('#eb0000');
-}
-
-function noResultsFound() {
-    return new MessageEmbed().setDescription(':mag: **No results found!**').setColor('#eb0000');
-}
-
 /**
- *
  * @param {Boolean} state
- * @returns
  */
 function pauseAudioPlayer(state) {
     return state
@@ -151,9 +70,16 @@ function pauseAudioPlayer(state) {
 }
 
 /**
- *
  * @param {Boolean} state
- * @returns
+ */
+function toggleAnnounce(state) {
+    return new MessageEmbed().setDescription(
+        `Announce on song start message is ${state ? bold('enabled') : bold('disabled')}`
+    );
+}
+
+/**
+ * @param {Boolean} state
  */
 function unpauseAudioPlayer(state) {
     return state
@@ -163,22 +89,7 @@ function unpauseAudioPlayer(state) {
               .setColor('#00eb55');
 }
 
-function successfulPrevTrack() {
-    return new MessageEmbed()
-        .setDescription(':track_next: **Back to previous song!**')
-        .setColor('#0070eb');
-}
-
-function successfulSkipTrack() {
-    return new MessageEmbed().setDescription(':track_next: **Skipped song!**').setColor('#0070eb');
-}
-
-function selectMenuPrompt() {
-    return new MessageEmbed().setDescription('**Select a song to play!**').setColor('#0070eb');
-}
-
 /**
- *
  * @param {String} url
  */
 async function selectedMenuMessage(url) {
@@ -189,17 +100,15 @@ async function selectedMenuMessage(url) {
 }
 
 /**
- *
  * @param {Number} length in seconds
  */
 function timeoutHasBeenReached(length) {
     return new MessageEmbed()
-        .setDescription(`:diamond_shape_with_a_dot_inside: Expired after ${length} seconds`)
+        .setDescription(`:diamond_shape_with_a_dot_inside: **Expired after ${length} seconds**`)
         .setColor('#0070eb');
 }
 
 /**
- *
  * @param {CommandInteraction} interaction
  */
 function filterMessage(interaction) {
@@ -208,35 +117,76 @@ function filterMessage(interaction) {
         .setColor('#0070eb');
 }
 
-function queueIsEmpty() {
-    return new MessageEmbed()
-        .setDescription(':diamond_shape_with_a_dot_inside:  The queue is empty')
-        .setColor('#eb0000');
-}
+const others = {
+    failedAddTrack: {
+        msg: ':octagonal_sign: **Failed to add track, please try again later!**',
+        color: '#eb0000',
+    },
+    notInVoiceChannel: {
+        msg: ':octagonal_sign: **Failed to add track, please try again later!**',
+        color: '#eb0000',
+    },
+    failedJoinVoiceChannel: {
+        msg: ':octagonal_sign: **Failed to join voice channel within 20 seconds, please try again later!**',
+        color: '#eb0000',
+    },
+    noSubscriptionAvailable: {
+        msg: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+        color: '#eb0000',
+    },
+    firstTrackInSubscription: {
+        msg: ':diamond_shape_with_a_dot_inside:  This is the first track in the queue',
+        color: '#eb0000',
+    },
+    invalidTrackNumber: {
+        msg: ':diamond_shape_with_a_dot_inside:  Please provide valid track number',
+        color: '#eb0000',
+    },
+    lastTrackInQueue: {
+        msg: ':diamond_shape_with_a_dot_inside:  The queue is already ended',
+        color: '#eb0000',
+    },
+    disconnectFromVoiceChannel: {
+        msg: ':small_red_triangle: **Disconnected from channel!**',
+        color: '#eb0000',
+    },
+    noResultsFound: {
+        msg: ':mag: **No results found!**',
+        color: '#eb0000',
+    },
+    successfulPrevTrack: {
+        msg: ':track_next: **Back to previous song!**',
+        color: '#0070eb',
+    },
+    successfulSkipTrack: {
+        msg: ':track_next: **Skipped song!**',
+        color: '#0070eb',
+    },
+    selectMenuPrompt: {
+        msg: '**Select a song to play!**',
+        color: '#0070eb',
+    },
+    queueShuffled: {
+        msg: '**Queue shuffled!**',
+        color: '#0070eb',
+    },
+    queueIsEmpty: {
+        msg: ':diamond_shape_with_a_dot_inside:  **The queue is empty**',
+        color: '#eb0000',
+    },
+};
 
 const response = {
     singleTrackEmbed,
-    albumEmbed,
     playlistEmbed,
-    failedCreateTrack,
-    notInVoiceChannel,
-    failedJoinVoiceChannel,
-    noSubscriptionAvailable,
-    timeoutHasBeenReached,
-    invalidTrackNumber,
     successfulChangeTrack,
-    disconnectFromVoiceChannel,
     pauseAudioPlayer,
-    successfulPrevTrack,
+    timeoutHasBeenReached,
     selectedMenuMessage,
-    firstTrackInSubscription,
     unpauseAudioPlayer,
     filterMessage,
-    successfulSkipTrack,
-    lastTrackInQueue,
-    noResultsFound,
-    selectMenuPrompt,
-    queueIsEmpty,
+    toggleAnnounce,
+    others,
 };
 
-module.exports = { response };
+module.exports = response;

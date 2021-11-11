@@ -1,3 +1,5 @@
+const { MessageEmbed } = require('discord.js');
+
 const urlRegex = /([a-z]+:\/\/)(?:([a-z0-9]+)\.)?([a-z0-9]+)\.([a-z]{2,})/;
 /**
  *
@@ -18,4 +20,25 @@ function isValidUrl(url) {
     return groups ? true : false;
 }
 
-module.exports = { matchUrlGroups, isValidUrl };
+/**
+ * @param {String[]} domains
+ * @param {String} url
+ */
+function isUrl(domains, url) {
+    return matchUrlGroups(url).some((term) => {
+        return domains.find((domain) => domain === term);
+    });
+}
+
+/**
+ *
+ * @param {string} message Message to send
+ * @param {string} color Color in hex
+ */
+function embedResponse({ msg, color }) {
+    const embed = new MessageEmbed().setDescription(msg);
+    if (color) embed.setColor(color);
+    return embed;
+}
+
+module.exports = { matchUrlGroups, isValidUrl, isUrl, embedResponse };

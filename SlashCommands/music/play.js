@@ -3,9 +3,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
 const { parsePlaylist, parseAlbum, parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
-const { isValidUrl } = require('../../utils/Utility');
+const { isValidUrl, isUrl, embedResponse } = require('../../utils/Utility');
 const { mc } = require('../../utils/MusicCommands');
-const { response } = require('../../responses/MusicCommandsResponse');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -37,7 +37,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [response.notInVoiceChannel()],
+                embeds: [embedResponse(resp.others.notInVoiceChannel)],
             });
         }
 
@@ -54,7 +54,7 @@ module.exports = {
         } catch (error) {
             console.warn(error);
             return await interaction.followUp({
-                embeds: [response.failedJoinVoiceChannel()],
+                embeds: [embedResponse(resp.others.failedJoinVoiceChannel)],
             });
         }
 
@@ -62,7 +62,7 @@ module.exports = {
         let mediaInfo;
         const trackPlaylist = [];
         if (isValidUrl(param)) {
-            if (mc.isUrl(['spotify'], param)) {
+            if (isUrl(['spotify'], param)) {
                 const type = await whatIsIt(param);
                 if (type.track) {
                     try {
@@ -71,7 +71,7 @@ module.exports = {
                             new Track(track, mc.trackInfoMethods(subscription, interaction, track))
                         );
 
-                        mediaInfo = response.singleTrackEmbed(
+                        mediaInfo = resp.singleTrackEmbed(
                             interaction,
                             track,
                             subscription.queue.length + 1
@@ -92,7 +92,7 @@ module.exports = {
                             );
                         });
 
-                        mediaInfo = response.albumEmbed(interaction, playlistInfo);
+                        mediaInfo = resp.playlistEmbed(interaction, playlistInfo);
                     } catch (error) {
                         console.log(error, '\n');
                     }
@@ -109,12 +109,12 @@ module.exports = {
                             );
                         });
 
-                        mediaInfo = response.playlistEmbed(interaction, playlistInfo);
+                        mediaInfo = resp.playlistEmbed(interaction, playlistInfo);
                     } catch (error) {
                         console.log(error, '\n');
                     }
                 }
-            } else if (mc.isUrl(['youtube', 'youtu'], param)) {
+            } else if (isUrl(['youtube', 'youtu'], param)) {
                 if (await mc.isYTPlaylist(param)) {
                     try {
                         const { playlistInfo, trackList } = await mc.TrackMetadataFromYTPlaylist(
@@ -130,7 +130,7 @@ module.exports = {
                             );
                         });
 
-                        mediaInfo = response.playlistEmbed(interaction, playlistInfo);
+                        mediaInfo = resp.playlistEmbed(interaction, playlistInfo);
                     } catch (error) {
                         console.log(error, '\n');
                     }
@@ -141,7 +141,7 @@ module.exports = {
                             new Track(track, mc.trackInfoMethods(subscription, interaction, track))
                         );
 
-                        mediaInfo = response.singleTrackEmbed(
+                        mediaInfo = resp.singleTrackEmbed(
                             interaction,
                             track,
                             subscription.queue.length + 1
@@ -160,7 +160,7 @@ module.exports = {
                     new Track(track, mc.trackInfoMethods(subscription, interaction, track))
                 );
 
-                mediaInfo = response.singleTrackEmbed(
+                mediaInfo = resp.singleTrackEmbed(
                     interaction,
                     track,
                     subscription.queue.length + 1
@@ -171,7 +171,7 @@ module.exports = {
         }
 
         if (trackPlaylist.length == 0) {
-            const embed = response.failedCreateTrack();
+            const embed = resp.failedCreateTrack();
             try {
                 return await interaction.followUp({ embeds: [embed] });
             } catch (error) {

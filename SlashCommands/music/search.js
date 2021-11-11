@@ -7,8 +7,10 @@ const {
 } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { search } = require('youtube-scrapper');
-const { response } = require('../../responses/MusicCommandsResponse');
+const { embedResponse } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 const selectMenu = require('../../utils/EmbedSelectMenu');
+const { TrackMetadata } = require('../../structures/TrackMetadata');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -29,7 +31,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [response.notInVoiceChannel()],
+                embeds: [embedResponse(resp.others.notInVoiceChannel)],
             });
         }
 
@@ -38,7 +40,9 @@ module.exports = {
         const listSong = results.videos.map((video) => {
             return {
                 label: video.title,
-                description: `Channel: ${video.author.name}\t Duration: ${video.duration / 1000}`,
+                description: `Channel: ${
+                    video.author.name
+                }\t Duration: ${TrackMetadata.getTrackDuration(video.duration / 1000)}`,
                 value: video.url,
             };
         });
@@ -51,7 +55,9 @@ module.exports = {
         );
 
         if (listSong.length == 0) {
-            return await interaction.followUp({ embeds: [response.noResultsFound()] });
+            return await interaction.followUp({
+                embeds: [embedResponse(resp.others.noResultsFound)],
+            });
         }
 
         selectMenu(client, interaction, row);

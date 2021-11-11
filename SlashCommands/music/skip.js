@@ -2,7 +2,8 @@ const { Client, CommandInteraction, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { AudioPlayerStatus } = require('@discordjs/voice');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
-const { response } = require('../../responses/MusicCommandsResponse');
+const { embedResponse } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -20,7 +21,7 @@ module.exports = {
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [response.notInVoiceChannel()],
+                embeds: [embedResponse(resp.others.notInVoiceChannel)],
             });
         }
 
@@ -28,19 +29,19 @@ module.exports = {
 
         if (!subscription) {
             return await interaction.followUp({
-                embeds: [response.noSubscriptionAvailable()],
+                embeds: [embedResponse(resp.others.noSubscriptionAvailable)],
             });
         }
 
         if (subscription.audioPlayer.state.status === AudioPlayerStatus.Idle) {
             return await interaction.followUp({
-                embeds: [response.lastTrackInQueue()],
+                embeds: [embedResponse(resp.others.lastTrackInQueue)],
             });
         }
 
         subscription.skip();
         await interaction.followUp({
-            embeds: [response.successfulSkipTrack()],
+            embeds: [embedResponse(resp.others.successfulSkipTrack)],
         });
     },
 };

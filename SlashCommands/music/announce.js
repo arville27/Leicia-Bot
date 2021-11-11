@@ -1,7 +1,8 @@
-const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
-const { SlashCommandBuilder, bold } = require('@discordjs/builders');
+const { Client, CommandInteraction } = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
-const { response } = require('../../responses/MusicCommandsResponse');
+const { embedResponse } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -14,23 +15,19 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: false });
+        await interaction.deferReply();
 
         const subscription = getGuildSubscription(client, interaction);
 
         if (!subscription) {
             return await interaction.followUp({
-                embeds: [response.noSubscriptionAvailable()],
+                embeds: [embedResponse(resp.others.noSubscriptionAvailable)],
             });
         }
 
         subscription.announce = !subscription.announce;
 
-        const embed = new MessageEmbed().setDescription(
-            `Announce on start message is set to ${
-                subscription.announce ? bold('ON') : bold('OFF')
-            }`
-        );
+        const embed = resp.toggleAnnounce(subscription.announce);
         try {
             await interaction.followUp({ embeds: [embed] });
         } catch (error) {

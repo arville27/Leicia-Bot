@@ -1,7 +1,8 @@
 const { Client, CommandInteraction, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
-const { response } = require('../../responses/MusicCommandsResponse');
+const { embedResponse } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -14,12 +15,12 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: false });
+        await interaction.deferReply();
 
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await interaction.followUp({
-                embeds: [response.notInVoiceChannel()],
+                embeds: [embedResponse(resp.notInVoiceChannel)],
             });
         }
 
@@ -27,14 +28,14 @@ module.exports = {
 
         if (!subscription) {
             return await interaction.followUp({
-                embeds: [response.noSubscriptionAvailable()],
+                embeds: [embedResponse(resp.noSubscriptionAvailable)],
             });
         }
 
         // subscription.pause() will return true if current audioPlayer state is Playing
         const state = subscription.pause();
         await interaction.followUp({
-            embeds: [response.pauseAudioPlayer(state)],
+            embeds: [resp.pauseAudioPlayer(state)],
         });
     },
 };

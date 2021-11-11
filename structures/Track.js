@@ -22,7 +22,7 @@ class Track {
         this.url = trackMetadata.url;
         this.thumbnail = trackMetadata.thumbnail;
         this.title = trackMetadata.title;
-        this.duration = Track.getTrackDuration(trackMetadata.length);
+        this.length = trackMetadata.length;
         this.onStart = trackInfoMethods.onStart;
         this.onFinish = trackInfoMethods.onFinish;
         this.onError = trackInfoMethods.onError;
@@ -83,17 +83,6 @@ class Track {
 
     getTrackMetadata() {
         return this.trackMetadata;
-    }
-
-    static getTrackDuration(length) {
-        const duration = {
-            hour: `${Math.floor(length / 3600)}`.padStart(2, 0),
-            minute: `${Math.floor((length / 60) % 60)}`.padStart(2, 0),
-            second: `${length % 60}`.padStart(2, 0),
-        };
-        if (parseInt(duration.hour) > 0)
-            return `${duration.hour}:${duration.minute}:${duration.second}`;
-        return `${duration.minute}:${duration.second}`;
     }
 }
 

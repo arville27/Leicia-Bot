@@ -1,5 +1,5 @@
 const { MessageActionRow, MessageEmbed, MessageButton, CommandInteraction } = require('discord.js');
-const { response } = require('../responses/MusicCommandsResponse');
+const resp = require('../responses/MusicCommandsResponse');
 const { promisify } = require('util');
 const wait = promisify(setTimeout);
 
@@ -39,7 +39,7 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
         if (validId && i.user === interaction.user) return true;
         else if (validId) {
             i.channel
-                .send({ embeds: [response.filterMessage(interaction)] })
+                .send({ embeds: [resp.filterMessage(interaction)] })
                 .then(async (msg) => {
                     await wait(8_000);
                     msg.delete();
