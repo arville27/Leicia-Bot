@@ -41,4 +41,14 @@ function embedResponse({ msg, color }) {
     return embed;
 }
 
-module.exports = { matchUrlGroups, isValidUrl, isUrl, embedResponse };
+/**
+ *
+ * @param {string} str String to truncate
+ * @param {number} max Max length of the string before truncated
+ * @returns
+ */
+function truncateString(str, max) {
+    return `${str.substr(0, max)}${str.length > max ? '...' : ''}`;
+}
+
+module.exports = { matchUrlGroups, isValidUrl, isUrl, embedResponse, truncateString };
