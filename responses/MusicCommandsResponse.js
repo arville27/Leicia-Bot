@@ -1,6 +1,7 @@
 const { MessageEmbed, CommandInteraction } = require('discord.js');
 const { TrackMetadata } = require('../structures/TrackMetadata');
 const { TrackMetadataFromYTUrl } = require('../utils/MusicCommands').mc;
+const { Track } = require('../structures/Track');
 
 /**
  *
@@ -18,7 +19,7 @@ function singleTrackEmbed(interaction, trackMetadata, trackPosition) {
         .addFields(
             {
                 name: 'Song Duration',
-                value: trackMetadata.getTrackDuration(),
+                value: Track.getTrackDuration(trackMetadata.length),
                 inline: true,
             },
             {

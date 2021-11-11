@@ -4,6 +4,7 @@ const { getPlaylistInfo, getVideoInfo, search } = require('youtube-scrapper');
 const { MusicSubscription } = require('../structures/MusicSubscription');
 const { TrackMetadata } = require('../structures/TrackMetadata');
 const { matchUrlGroups } = require('../utils/Utility');
+const { Track } = require('../structures/Track');
 
 /**
  *
@@ -57,7 +58,7 @@ const trackInfoMethods = (subscription, interaction, trackMetadata) => {
                 .addFields(
                     {
                         name: 'Song Duration',
-                        value: trackMetadata.getTrackDuration(),
+                        value: Track.getTrackDuration(trackMetadata.length),
                         inline: true,
                     },
                     {

@@ -18,10 +18,11 @@ class Track {
      * @param {TrackInfoMethods} trackInfoMethods
      */
     constructor(trackMetadata, trackInfoMethods) {
+        this.trackMetadata = trackMetadata;
         this.url = trackMetadata.url;
         this.thumbnail = trackMetadata.thumbnail;
         this.title = trackMetadata.title;
-        this.duration = trackMetadata.getTrackDuration();
+        this.duration = Track.getTrackDuration(trackMetadata.length);
         this.onStart = trackInfoMethods.onStart;
         this.onFinish = trackInfoMethods.onFinish;
         this.onError = trackInfoMethods.onError;
@@ -78,6 +79,21 @@ class Track {
         this.onStart = methodsObject.onStart;
         this.onFinish = methodsObject.onFinish;
         this.onError = methodsObject.onError;
+    }
+
+    getTrackMetadata() {
+        return this.trackMetadata;
+    }
+
+    static getTrackDuration(length) {
+        const duration = {
+            hour: `${Math.floor(length / 3600)}`.padStart(2, 0),
+            minute: `${Math.floor((length / 60) % 60)}`.padStart(2, 0),
+            second: `${length % 60}`.padStart(2, 0),
+        };
+        if (parseInt(duration.hour) > 0)
+            return `${duration.hour}:${duration.minute}:${duration.second}`;
+        return `${duration.minute}:${duration.second}`;
     }
 }
 
