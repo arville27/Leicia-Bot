@@ -42,16 +42,18 @@ module.exports = {
         let embed;
         if (option === 'song' && !queue) {
             subscription.loop = { queue: queue, song: !song };
-            embed = new MessageEmbed().setDescription(
-                bold(`Loop track is ${bold(!song ? 'enabled' : 'disabled')}`)
-            );
+            embed = new MessageEmbed()
+                .setDescription(`Loop track is ${bold(!song ? 'enabled' : 'disabled')}`)
+                .setColor('#0070eb');
         } else if (option === 'queue' && !song) {
             subscription.loop = { queue: !queue, song: song };
-            embed = new MessageEmbed().setDescription(
-                bold(`Loop queue is ${bold(!queue ? 'enabled' : 'disabled')}`)
-            );
+            embed = new MessageEmbed()
+                .setDescription(`Loop queue is ${bold(!queue ? 'enabled' : 'disabled')}`)
+                .setColor('#0070eb');
         } else {
-            embed = new MessageEmbed().setDescription(`:x: ${bold('Wait, thats illegal!')}`);
+            embed = new MessageEmbed()
+                .setDescription(`:x: ${bold('Wait, thats illegal!')}`)
+                .setColor('#eb0000');
             return await reply(interaction, embed);
         }
         await reply(interaction, embed);
