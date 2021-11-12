@@ -71,7 +71,13 @@ const trackInfoMethods = (subscription, interaction, trackMetadata) => {
             await reply(interaction, trackInfo);
         },
         onFinish: async () => {
-            await reply(interaction, embedResponse(resp.others.queueFinished));
+            await reply(
+                interaction,
+                embedResponse({
+                    msg: ':musical_note: **Queue finished**',
+                    color: '#eb0000',
+                })
+            );
         },
         onError: (error) => {
             console.log(error);
