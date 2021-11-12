@@ -3,6 +3,8 @@ const { joinVoiceChannel } = require('@discordjs/voice');
 const { getPlaylistInfo, getVideoInfo, search } = require('youtube-scrapper');
 const { MusicSubscription } = require('../structures/MusicSubscription');
 const { TrackMetadata } = require('../structures/TrackMetadata');
+const { reply } = require('../utils/Utility');
+const resp = require('../responses/MusicCommandsResponse');
 
 /**
  *
@@ -66,25 +68,10 @@ const trackInfoMethods = (subscription, interaction, trackMetadata) => {
                     }
                 )
                 .setTimestamp();
-            try {
-                await interaction.followUp({ embeds: [trackInfo] });
-            } catch (err) {
-                await interaction.channel.send({ embeds: [trackInfo] });
-            }
+            await reply(interaction, trackInfo);
         },
         onFinish: async () => {
-            const embed = new MessageEmbed()
-                .setDescription(':musical_note: **Queue finished**')
-                .setColor('#eb0000');
-            try {
-                return await interaction.followUp({
-                    embeds: [embed],
-                });
-            } catch (error) {
-                return await interaction.channel.send({
-                    embeds: [embed],
-                });
-            }
+            await reply(interaction, resp.others.queueFinished);
         },
         onError: (error) => {
             console.log(error);

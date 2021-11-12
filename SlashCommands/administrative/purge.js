@@ -1,5 +1,7 @@
 const { Client, CommandInteraction } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, inlineCode } = require('@discordjs/builders');
+const { embedResponse, reply } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -24,8 +26,12 @@ module.exports = {
         const permToCheck = 'MANAGE_MESSAGES';
         const permissions = interaction.channel.permissionsFor(interaction.guild.me);
         if (!permissions.has(permToCheck)) {
-            return await interaction.followUp(
-                `I dont have permission to do that! (PERM: ${permToCheck}}`
+            return await reply(
+                interaction,
+                embedResponse({
+                    msg: `I dont have permission to do that! (${inlineCode(permToCheck)})`,
+                    color: '#eb0000',
+                })
             );
         }
         let amount = interaction.options.getInteger('amount');
@@ -49,9 +55,13 @@ module.exports = {
                 .fetch({ limit: amount })
                 .then((messages) => messages.filter(filterMessage));
         } else {
-            return await interaction.editReply({
-                content: `Amount is should be less than 100`,
-            });
+            return await reply(
+                interaction,
+                embedResponse({
+                    msg: `Amount is should be less than 100`,
+                    color: '#eb0000',
+                })
+            );
         }
 
         try {
@@ -60,13 +70,21 @@ module.exports = {
             console.log('[ERROR] There is a message that cannot be deleted');
         }
         if (canBeDeleted < amount) {
-            await interaction.editReply({
-                content: `Successfuly delete ${canBeDeleted} message(s), the rest cannot be deleted`,
-            });
+            await reply(
+                interaction,
+                embedResponse({
+                    msg: `Successfuly delete ${canBeDeleted} message(s), the rest cannot be deleted`,
+                    color: '#0070eb',
+                })
+            );
         } else {
-            await interaction.editReply({
-                content: `Successfuly delete ${canBeDeleted} message(s)`,
-            });
+            await reply(
+                interaction,
+                embedResponse({
+                    msg: `Successfuly delete ${canBeDeleted} message(s)`,
+                    color: '#0070eb',
+                })
+            );
         }
     },
 };

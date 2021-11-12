@@ -1,7 +1,7 @@
 const { Client, CommandInteraction } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
-const { embedResponse } = require('../../utils/Utility');
+const { embedResponse, reply } = require('../../utils/Utility');
 const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
@@ -20,18 +20,11 @@ module.exports = {
         const subscription = getGuildSubscription(client, interaction);
 
         if (!subscription) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.noSubscriptionAvailable)],
-            });
+            return await reply(interaction, embedResponse(resp.others.noSubscriptionAvailable));
         }
 
         subscription.announce = !subscription.announce;
 
-        const embed = resp.toggleAnnounce(subscription.announce);
-        try {
-            await interaction.followUp({ embeds: [embed] });
-        } catch (error) {
-            await interaction.channel.send({ embeds: [embed] });
-        }
+        await reply(interaction, resp.toggleAnnounce(subscription.announce));
     },
 };

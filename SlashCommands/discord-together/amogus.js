@@ -1,6 +1,6 @@
 const { Client, CommandInteraction, MessageEmbed, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { embedResponse } = require('../../utils/Utility');
+const { embedResponse, reply } = require('../../utils/Utility');
 const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
@@ -12,13 +12,11 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: false });
+        await interaction.deferReply();
 
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.notInVoiceChannel)],
-            });
+            return await reply(interaction, embedResponse(resp.others.notInVoiceChannel));
         }
 
         client.discordTogether
@@ -28,11 +26,7 @@ module.exports = {
                     .setTitle('Play betrayal')
                     .setTimestamp()
                     .setDescription(`**[Click here to join](${invite.code})**`);
-                try {
-                    await interaction.followUp({ embeds: [embed] });
-                } catch (error) {
-                    await interaction.channel.send({ embeds: [embed] });
-                }
+                await reply(interaction, embed);
             });
     },
 };

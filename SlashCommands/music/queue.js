@@ -2,7 +2,7 @@ const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('dis
 const { SlashCommandBuilder, bold, inlineCode } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
 const paginationEmbed = require('../../utils/EmbedPagination');
-const { embedResponse } = require('../../utils/Utility');
+const { embedResponse, reply } = require('../../utils/Utility');
 const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
@@ -18,14 +18,10 @@ module.exports = {
         const subscription = getGuildSubscription(client, interaction);
 
         if (!subscription) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.noSubscriptionAvailable)],
-            });
+            return await reply(interaction, embedResponse(resp.others.noSubscriptionAvailable));
         } else if (subscription && subscription.queue.length == 0) {
             // subscription is created, by the queue is empty
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.queueIsEmpty)],
-            });
+            return await reply(interaction, embedResponse(resp.others.queueIsEmpty));
         }
 
         const generateTrackInfo = (no, track) => {

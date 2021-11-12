@@ -1,7 +1,8 @@
-const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('discord.js');
-const { SlashCommandBuilder, inlineCode, bold, hyperlink } = require('@discordjs/builders');
+const { Client, CommandInteraction } = require('discord.js');
+const { SlashCommandBuilder, inlineCode, bold } = require('@discordjs/builders');
 const SavedPlaylist = require('../../models/SavedPlaylist');
-const { embedResponse, truncateString } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
+const { embedResponse, truncateString, reply } = require('../../utils/Utility');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -22,25 +23,22 @@ module.exports = {
         const playlistName = interaction.options.getString('name');
         const query = { author: interaction.user.id, _id: playlistName };
 
-        const resp = await SavedPlaylist.deleteOne(query);
-        // console.log(resp);
-        if (resp.deletedCount === 0) {
-            await interaction.followUp({
-                embeds: [embedResponse({ msg: bold('Invalid playlist name'), color: '#eb0000' })],
-            });
+        const response = await SavedPlaylist.deleteOne(query);
+
+        if (response.deletedCount === 0) {
+            await reply(interaction, embedResponse(resp.others.invalidPlaylistName));
         } else {
-            await interaction.followUp({
-                embeds: [
-                    embedResponse({
-                        msg: bold(
-                            `Successfully delete playlist ${inlineCode(
-                                truncateString(playlistName, 30)
-                            )}`
-                        ),
-                        color: '#0070eb',
-                    }),
-                ],
-            });
+            await reply(
+                interaction,
+                embedResponse({
+                    msg: bold(
+                        `Successfully delete playlist ${inlineCode(
+                            truncateString(playlistName, 30)
+                        )}`
+                    ),
+                    color: '#0070eb',
+                })
+            );
         }
     },
 };

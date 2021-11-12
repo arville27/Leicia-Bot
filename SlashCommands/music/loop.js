@@ -1,7 +1,7 @@
 const { Client, CommandInteraction, GuildMember, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder, bold } = require('@discordjs/builders');
 const { getGuildSubscription } = require('../../utils/MusicCommands').mc;
-const { embedResponse } = require('../../utils/Utility');
+const { embedResponse, reply } = require('../../utils/Utility');
 const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
@@ -29,17 +29,12 @@ module.exports = {
 
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.notInVoiceChannel)],
-            });
+            return await reply(interaction, embedResponse(resp.others.notInVoiceChannel));
         }
 
-        const subscription = getGuildSubscription(client, interaction);
-
+        let subscription = getGuildSubscription(client, interaction);
         if (!subscription) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.noSubscriptionAvailable)],
-            });
+            return await reply(interaction, embedResponse(resp.others.noSubscriptionAvailable));
         }
 
         let { queue, song } = subscription.loop;
@@ -47,14 +42,18 @@ module.exports = {
         let embed;
         if (option === 'song' && !queue) {
             subscription.loop = { queue: queue, song: !song };
-            embed = new MessageEmbed().setDescription(bold(`Loop track: ${!song ? 'ON' : 'OFF'}`));
+            embed = new MessageEmbed().setDescription(
+                bold(`Loop track is ${bold(!song ? 'enabled' : 'disabled')}`)
+            );
         } else if (option === 'queue' && !song) {
             subscription.loop = { queue: !queue, song: song };
-            embed = new MessageEmbed().setDescription(bold(`Loop queue: ${!queue ? 'ON' : 'OFF'}`));
+            embed = new MessageEmbed().setDescription(
+                bold(`Loop queue is ${bold(!queue ? 'enabled' : 'disabled')}`)
+            );
         } else {
             embed = new MessageEmbed().setDescription(`:x: ${bold('Wait, thats illegal!')}`);
-            return await interaction.followUp({ embeds: [embed] });
+            return await reply(interaction, embed);
         }
-        await interaction.followUp({ embeds: [embed] });
+        await reply(interaction, embed);
     },
 };

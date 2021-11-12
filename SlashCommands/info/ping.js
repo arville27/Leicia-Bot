@@ -1,5 +1,6 @@
 const { Client, CommandInteraction, MessageEmbed } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { reply } = require('../../utils/Utility');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
@@ -11,15 +12,13 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         await interaction.deferReply();
-        await interaction.followUp({
-            embeds: [
-                new MessageEmbed().addFields({
-                    name: '🏓 Pong!',
-                    value: `Latency is ${
-                        Date.now() - interaction.createdTimestamp
-                    } ms\nAPI Latency! (${client.ws.ping} ms)`,
-                }),
-            ],
+
+        const embed = new MessageEmbed().addFields({
+            name: '🏓 Pong!',
+            value: `Latency is ${Date.now() - interaction.createdTimestamp} ms\nAPI Latency! (${
+                client.ws.ping
+            } ms)`,
         });
+        await reply(interaction, embed);
     },
 };

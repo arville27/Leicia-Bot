@@ -2,7 +2,8 @@ const { Client, CommandInteraction, MessageEmbed, MessageButton } = require('dis
 const { SlashCommandBuilder, inlineCode, bold, hyperlink } = require('@discordjs/builders');
 const paginationEmbed = require('../../utils/EmbedPagination');
 const SavedPlaylist = require('../../models/SavedPlaylist');
-const { embedResponse, truncateString } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
+const { embedResponse, reply, truncateString } = require('../../utils/Utility');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -24,26 +25,11 @@ module.exports = {
         const playlistName = interaction.options.getString('name');
         if (playlistName) query._id = playlistName;
         const playlists = await SavedPlaylist.find(query).catch(async (err) => {
-            console.log(err);
-            return await interaction.followUp({
-                embeds: [
-                    embedResponse({
-                        msg: `${bold('Unknown error')}\nPlease try again later.`,
-                        color: '#eb0000',
-                    }),
-                ],
-            });
+            return await reply(interaction, embedResponse(resp.others.generalError));
         });
 
         if (playlists.length === 0) {
-            return await interaction.followUp({
-                embeds: [
-                    embedResponse({
-                        msg: bold(`You don't have any playlist or the playlist is does not exists`),
-                        color: '#eb0000',
-                    }),
-                ],
-            });
+            return await reply(interaction, embedResponse(resp.others.noPlaylist));
         }
 
         let pages;

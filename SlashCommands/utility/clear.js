@@ -1,5 +1,7 @@
 const { Client, CommandInteraction } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, inlineCode } = require('@discordjs/builders');
+const { embedResponse, reply } = require('../../utils/Utility');
+const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('clear').setDescription('Delete bot responses'),
@@ -15,8 +17,12 @@ module.exports = {
         const permToCheck = 'MANAGE_MESSAGES';
         const permissions = interaction.channel.permissionsFor(interaction.guild.me);
         if (!permissions.has(permToCheck)) {
-            return await interaction.followUp(
-                `I dont have permission to do that! (PERM: ${permToCheck})`
+            return await reply(
+                interaction,
+                embedResponse({
+                    msg: `I dont have permission to do that! (${inlineCode(permToCheck)})`,
+                    color: '#eb0000',
+                })
             );
         }
         const messages = await interaction.channel.messages
@@ -35,8 +41,12 @@ module.exports = {
         } catch (error) {
             console.log('[ERROR] There is a message that cannot be deleted');
         }
-        await interaction.editReply({
-            content: 'Successfully clean bot responses',
-        });
+        await reply(
+            interaction,
+            embedResponse({
+                msg: `Successfully clean bot response`,
+                color: '#0070eb',
+            })
+        );
     },
 };

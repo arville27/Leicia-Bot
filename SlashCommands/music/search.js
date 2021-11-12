@@ -7,7 +7,7 @@ const {
 } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { search } = require('youtube-scrapper');
-const { embedResponse } = require('../../utils/Utility');
+const { embedResponse, reply } = require('../../utils/Utility');
 const resp = require('../../responses/MusicCommandsResponse');
 const selectMenu = require('../../utils/EmbedSelectMenu');
 const { TrackMetadata } = require('../../structures/TrackMetadata');
@@ -26,13 +26,11 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ ephemeral: false });
+        await interaction.deferReply();
 
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.notInVoiceChannel)],
-            });
+            return await reply(interaction, embedResponse(resp.others.notInVoiceChannel));
         }
 
         const terms = interaction.options.getString('terms');
@@ -55,9 +53,7 @@ module.exports = {
         );
 
         if (listSong.length == 0) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.noResultsFound)],
-            });
+            return await reply(interaction, embedResponse(resp.others.noResultsFound));
         }
 
         selectMenu(client, interaction, row);

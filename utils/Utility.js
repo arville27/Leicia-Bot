@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, CommandInteraction } = require('discord.js');
 
 const urlRegex = /([a-z]+:\/\/)(?:([a-z0-9]+)\.)?([a-z0-9]+)\.([a-z]{2,})/;
 /**
@@ -51,4 +51,17 @@ function truncateString(str, max) {
     return `${str.substr(0, max)}${str.length > max ? '...' : ''}`;
 }
 
-module.exports = { matchUrlGroups, isValidUrl, isUrl, embedResponse, truncateString };
+/**
+ *
+ * @param {CommandInteraction} interaction
+ * @param {MessageEmbed} embed
+ */
+async function reply(interaction, embed) {
+    try {
+        await interaction.followUp({ embeds: [embed] });
+    } catch (error) {
+        await interaction.channel.send({ embeds: [embed] });
+    }
+}
+
+module.exports = { matchUrlGroups, isValidUrl, isUrl, embedResponse, truncateString, reply };

@@ -131,7 +131,7 @@ const others = {
         color: '#eb0000',
     },
     noSubscriptionAvailable: {
-        msg: ':diamond_shape_with_a_dot_inside:  Currently not playing in this server!',
+        msg: bold(':diamond_shape_with_a_dot_inside:  Currently not playing in this server!'),
         color: '#eb0000',
     },
     firstTrackInSubscription: {
@@ -139,7 +139,7 @@ const others = {
         color: '#eb0000',
     },
     invalidTrackNumber: {
-        msg: ':diamond_shape_with_a_dot_inside:  Please provide valid track number',
+        msg: bold(':diamond_shape_with_a_dot_inside:  Please provide valid track number'),
         color: '#eb0000',
     },
     lastTrackInQueue: {
@@ -172,6 +172,26 @@ const others = {
     },
     queueIsEmpty: {
         msg: ':diamond_shape_with_a_dot_inside:  **The queue is empty**',
+        color: '#eb0000',
+    },
+    invalidPlaylistName: {
+        msg: bold('Invalid playlist name'),
+        color: '#eb0000',
+    },
+    generalError: {
+        msg: `${bold('Unknown error')}\nPlease try again later.`,
+        color: '#eb0000',
+    },
+    noPlaylist: {
+        msg: bold(`You don't have any playlist or the playlist is does not exists`),
+        color: '#eb0000',
+    },
+    insufficentPerm: {
+        msg: "You don't have permission to use this command!",
+        color: '#eb0000',
+    },
+    queueFinished: {
+        msg: ':musical_note: **Queue finished**',
         color: '#eb0000',
     },
 };

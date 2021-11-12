@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
 const { parsePlaylist, parseAlbum, parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
-const { isValidUrl, isUrl, embedResponse } = require('../../utils/Utility');
+const { isValidUrl, isUrl, embedResponse, reply } = require('../../utils/Utility');
 const { mc } = require('../../utils/MusicCommands');
 const resp = require('../../responses/MusicCommandsResponse');
 
@@ -36,9 +36,7 @@ module.exports = {
 
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.notInVoiceChannel)],
-            });
+            return await reply(interaction, embedResponse(resp.others.notInVoiceChannel));
         }
 
         let subscription = mc.getGuildSubscription(client, interaction);
@@ -53,9 +51,7 @@ module.exports = {
             await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
         } catch (error) {
             console.warn(error);
-            return await interaction.followUp({
-                embeds: [embedResponse(resp.others.failedJoinVoiceChannel)],
-            });
+            return await reply(interaction, embedResponse(resp.others.failedJoinVoiceChannel));
         }
 
         let param = args[0];
@@ -171,19 +167,10 @@ module.exports = {
         }
 
         if (trackPlaylist.length == 0) {
-            const embed = embedResponse(resp.others.failedAddTrack);
-            try {
-                return await interaction.followUp({ embeds: [embed] });
-            } catch (error) {
-                return await interaction.channel.send({ embeds: [embed] });
-            }
+            return await reply(interaction, embedResponse(resp.others.failedAddTrack));
         }
 
         subscription.enqueue(trackPlaylist);
-        try {
-            await interaction.followUp({ embeds: [mediaInfo] });
-        } catch (error) {
-            await interaction.channel.send({ embeds: [mediaInfo] });
-        }
+        await reply(interaction, mediaInfo);
     },
 };
