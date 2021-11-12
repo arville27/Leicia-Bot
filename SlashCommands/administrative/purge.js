@@ -1,7 +1,6 @@
 const { Client, CommandInteraction } = require('discord.js');
 const { SlashCommandBuilder, inlineCode } = require('@discordjs/builders');
 const { embedResponse, reply } = require('../../utils/Utility');
-const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
