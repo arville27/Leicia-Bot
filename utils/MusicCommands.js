@@ -3,7 +3,7 @@ const { joinVoiceChannel } = require('@discordjs/voice');
 const { getPlaylistInfo, getVideoInfo, search } = require('youtube-scrapper');
 const { MusicSubscription } = require('../structures/MusicSubscription');
 const { TrackMetadata } = require('../structures/TrackMetadata');
-const { reply } = require('../utils/Utility');
+const { embedResponse, reply } = require('../utils/Utility');
 const resp = require('../responses/MusicCommandsResponse');
 
 /**
@@ -71,7 +71,7 @@ const trackInfoMethods = (subscription, interaction, trackMetadata) => {
             await reply(interaction, trackInfo);
         },
         onFinish: async () => {
-            await reply(interaction, resp.others.queueFinished);
+            await reply(interaction, embedResponse(resp.others.queueFinished));
         },
         onError: (error) => {
             console.log(error);
