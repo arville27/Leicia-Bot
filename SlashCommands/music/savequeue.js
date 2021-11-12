@@ -45,9 +45,16 @@ module.exports = {
             await SavedPlaylist.create(playlist);
         } catch (error) {
             if (error.code === 11000) {
+                await SavedPlaylist.updateOne(
+                    { _id: playlistName, author: interaction.user.id },
+                    playlist
+                );
                 return await interaction.followUp({
                     embeds: [
-                        embedResponse({ msg: bold('Duplicate playlist name'), color: '#eb0000' }),
+                        embedResponse({
+                            msg: bold(`Successfully update ${inlineCode(playlistName)} playlist`),
+                            color: '#eb0000',
+                        }),
                     ],
                 });
             }
