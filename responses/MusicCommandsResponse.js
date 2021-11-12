@@ -123,7 +123,7 @@ const others = {
         color: '#eb0000',
     },
     notInVoiceChannel: {
-        msg: ':octagonal_sign: **Failed to add track, please try again later!**',
+        msg: ':octagonal_sign: **Please join voice channel and try again later!**',
         color: '#eb0000',
     },
     failedJoinVoiceChannel: {
