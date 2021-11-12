@@ -39,11 +39,7 @@ module.exports = {
             return await interaction.followUp({
                 embeds: [
                     embedResponse({
-                        msg: bold(
-                            `Playlist with name ${inlineCode(
-                                truncateString(playlistName, 100)
-                            )} is does not exists`
-                        ),
+                        msg: bold(`You don't have any playlist or the playlist is does not exists`),
                         color: '#eb0000',
                     }),
                 ],

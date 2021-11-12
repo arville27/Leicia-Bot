@@ -171,7 +171,7 @@ module.exports = {
         }
 
         if (trackPlaylist.length == 0) {
-            const embed = resp.failedCreateTrack();
+            const embed = embedResponse(resp.others.failedAddTrack);
             try {
                 return await interaction.followUp({ embeds: [embed] });
             } catch (error) {
