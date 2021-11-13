@@ -43,8 +43,8 @@ class Track {
                         ? (format) => format.isHLS === true
                         : (format) => format.container === 'webm' && format.codecs === 'opus',
                     quality: 'highestaudio',
-                    highWaterMark: 1 << 10,
-                    liveBuffer: 2000,
+                    highWaterMark: 1 << 23,
+                    liveBuffer: 2500,
                     dlChunkSize: 1 << 12,
                 });
 
@@ -57,6 +57,7 @@ class Track {
                     })
                 );
             } catch (error) {
+                console.log(error);
                 reject(error);
             }
         });
