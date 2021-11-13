@@ -1,5 +1,5 @@
 const { Client, CommandInteraction, GuildMember } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, bold } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
 const { parsePlaylist, parseAlbum, parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
@@ -143,7 +143,16 @@ module.exports = {
                             subscription.queue.length + 1
                         );
                     } catch (error) {
-                        console.log(error, '\n');
+                        console.log(error);
+                        return await reply(
+                            interaction,
+                            embedResponse({
+                                msg: bold(
+                                    `:x: Failed to add track due to video unavailable or age restricted content`
+                                ),
+                                color: '#eb0000',
+                            })
+                        );
                     }
                 }
             }

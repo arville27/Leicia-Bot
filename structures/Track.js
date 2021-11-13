@@ -1,7 +1,7 @@
-const { createAudioResource, demuxProbe } = require('@discordjs/voice');
-const { raw } = require('youtube-dl-exec');
+const { createAudioResource, StreamType } = require('@discordjs/voice');
 const { TrackMetadata } = require('./TrackMetadata');
-const { ytCookies } = require('../config.json');
+const ytdl = require('ytdl-core');
+// const { ytCookies } = require('../config.json');
 /**
  * A Track represents information about a YouTube video (in this context) that can be added to a queue.
  * It contains the title and URL of the video, as well as functions onStart, onFinish, onError, that act
@@ -32,42 +32,33 @@ class Track {
      * Creates an AudioResource from this Track.
      */
     createAudioResource() {
-        const flags = {
-            o: '-',
-            q: '',
-            f: 'bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio',
-        };
-
-        if (ytCookies) {
-            flags.cookies = ytCookies;
-        }
-
+        // if (ytCookies) {
+        //     flags.cookies = ytCookies;
+        // }
         return new Promise((resolve, reject) => {
-            const process = raw(this.url, flags, { stdio: ['ignore', 'pipe', 'ignore'] });
-            if (!process.stdout) {
-                reject(new Error('No stdout'));
-                return;
-            }
-            const stream = process.stdout;
-            const onError = (error) => {
-                if (!process.killed) process.kill();
-                stream.resume();
+            try {
+                const stream = ytdl(this.url, {
+                    // filter: (format) => format.container === 'mp4',
+                    filter: this.trackMetadata.isLive
+                        ? (format) => format.isHLS === true
+                        : (format) => format.container === 'webm' && format.codecs === 'opus',
+                    quality: 'highestaudio',
+                    highWaterMark: 1 << 10,
+                    liveBuffer: 2000,
+                    dlChunkSize: 1 << 12,
+                });
+
+                const type = this.trackMetadata.isLive ? StreamType.Arbitrary : StreamType.WebmOpus;
+
+                resolve(
+                    createAudioResource(stream, {
+                        metadata: this,
+                        inputType: type,
+                    })
+                );
+            } catch (error) {
                 reject(error);
-            };
-            process
-                .once('spawn', () => {
-                    demuxProbe(stream)
-                        .then((probe) =>
-                            resolve(
-                                createAudioResource(probe.stream, {
-                                    metadata: this,
-                                    inputType: probe.type,
-                                })
-                            )
-                        )
-                        .catch(onError);
-                })
-                .catch(onError);
+            }
         });
     }
 

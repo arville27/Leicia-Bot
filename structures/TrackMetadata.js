@@ -6,14 +6,16 @@ class TrackMetadata {
      * @param {String} thumbnail Thumbnail URL
      * @param {Number} length Track length in seconds
      */
-    constructor({ title, url, thumbnail, length }) {
+    constructor({ title, url, thumbnail, length, isLive }) {
         this.title = title;
         this.url = url;
         this.thumbnail = thumbnail;
         this.length = TrackMetadata.getTrackDuration(length);
+        this.isLive = isLive;
     }
 
     static getTrackDuration(length) {
+        if (length === 0) return 'Live stream';
         const duration = {
             hour: `${Math.floor(length / 3600)}`.padStart(2, 0),
             minute: `${Math.floor((length / 60) % 60)}`.padStart(2, 0),

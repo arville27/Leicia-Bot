@@ -22,8 +22,8 @@
         "mongoose": "^6.0.2",
         "opusscript": "^0.0.8",
         "spotify-info.js": "^1.0.4",
-        "youtube-dl-exec": "^1.2.6",
-        "youtube-scrapper": "^1.1.8"
+        "youtube-scrapper": "^1.1.8",
+        "ytdl-core": "^4.9.1"
     },
     "devDependencies": {
         "eslint": "^7.32.0",

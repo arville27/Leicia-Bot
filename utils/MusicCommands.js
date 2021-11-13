@@ -4,7 +4,6 @@ const { getPlaylistInfo, getVideoInfo, search } = require('youtube-scrapper');
 const { MusicSubscription } = require('../structures/MusicSubscription');
 const { TrackMetadata } = require('../structures/TrackMetadata');
 const { embedResponse, reply } = require('../utils/Utility');
-const resp = require('../responses/MusicCommandsResponse');
 
 /**
  *
@@ -101,15 +100,19 @@ const isYTPlaylist = async (url) => {
  *
  * @param {string} query
  */
-const trackMetadataFrom = async (query) => {
+const trackMetadataFrom = async (query, allowLive = true) => {
     const res = await search(query);
     if (!res.videos.length) throw 'No results found';
-    const video = res.videos[0];
+    const video = res.videos.find(async (video) => {
+        const { status } = await playability(video.url);
+        return (allowLive ? video.duration >= 0 : video.duration > 0) && status;
+    });
     return new TrackMetadata({
         title: video.title,
         url: video.url,
         thumbnail: video.thumbnails[0].url,
         length: video.duration / 1000,
+        isLive: video.duration === 0 ? true : false,
     });
 };
 
@@ -127,12 +130,18 @@ async function TrackMetadataFromYTUrl(url) {
             return null;
         });
 
+    const playability = video.json.playabilityStatus.status === 'OK';
+    if (!playability) {
+        throw video.json.playabilityStatus.reason;
+    }
+
     if (video) {
         return new TrackMetadata({
             title: video.details.title,
             url: video.details.url,
             thumbnail: video.details.thumbnails[0].url,
             length: video.details.duration / 1000,
+            isLive: video.details.isLiveContent && video.details.duration === 0 ? true : false,
         });
     }
 }
@@ -159,12 +168,22 @@ async function TrackMetadataFromYTPlaylist(playlistId) {
             url: video.url,
             thumbnail: video.thumbnails[0].url,
             length: video.duration / 1000,
+            isLive: video.duration === 0 ? true : false,
         });
 
         return track;
     });
 
     return { playlistInfo, trackList };
+}
+
+async function playability(url) {
+    const res = await getVideoInfo(url);
+    const playability = res.json.playabilityStatus.status === 'OK';
+    return {
+        status: playability,
+        reason: !playability ? res.json.playabilityStatus.reason : '',
+    };
 }
 
 const mc = {

@@ -49,7 +49,7 @@ const parsePlaylist = async (url) => {
         return `${title} ${artists}`;
     });
 
-    const tracksMetadata = trackInfos.map((query) => trackMetadataFrom(query));
+    const tracksMetadata = trackInfos.map((query) => trackMetadataFrom(query, false));
     return {
         playlistInfo: {
             playlistName: playlist.name,
@@ -68,7 +68,7 @@ const parseAlbum = async (url) => {
         return `${title} ${artists}`;
     });
 
-    const tracksMetadata = trackInfos.map((query) => trackMetadataFrom(query));
+    const tracksMetadata = trackInfos.map((query) => trackMetadataFrom(query, false));
     return {
         playlistInfo: {
             playlistName: `${artists} - ${album.name}`,
@@ -81,7 +81,7 @@ const parseAlbum = async (url) => {
 
 const parseTrack = async (url) => {
     const track = await spotify.getTrackByURL(url);
-    return trackMetadataFrom(track.name);
+    return trackMetadataFrom(track.name, false);
 };
 
 module.exports = { isTrack, isAlbum, isPlaylist, whatIsIt, parsePlaylist, parseAlbum, parseTrack };

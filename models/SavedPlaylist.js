@@ -17,6 +17,10 @@ const TrackSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    isLive: {
+        type: Boolean,
+        required: false,
+    },
 });
 
 const PlaylistSchema = mongoose.Schema({
