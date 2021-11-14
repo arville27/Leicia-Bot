@@ -45,7 +45,7 @@ class Track {
                     quality: 'highestaudio',
                     highWaterMark: 1 << 23,
                     liveBuffer: 2500,
-                    dlChunkSize: 1 << 12,
+                    // dlChunkSize: 1 << 12,
                 });
 
                 const type = this.trackMetadata.isLive ? StreamType.Arbitrary : StreamType.WebmOpus;
