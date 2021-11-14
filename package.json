@@ -22,6 +22,7 @@
         "mongoose": "^6.0.2",
         "opusscript": "^0.0.8",
         "spotify-info.js": "^1.0.4",
+        "youtube-dl-exec": "^1.3.3",
         "youtube-scrapper": "^1.1.8",
         "ytdl-core": "^4.9.1"
     },
