@@ -22,7 +22,7 @@ module.exports = {
         }
 
         client.discordTogether
-            .createTogetherCode(interaction.member.voice.channel.id, 'youtubeDev')
+            .createTogetherCode(interaction.member.voice.channel.id, 'youtube')
             .then(async (invite) => {
                 const embed = new MessageEmbed()
                     .setTitle('Watch YouTube Together')
