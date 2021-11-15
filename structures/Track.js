@@ -39,7 +39,7 @@ class Track {
                     const stream = ytcore(this.url, {
                         filter: (format) => format.isHLS,
                         quality: 'highestaudio',
-                        highWaterMark: 1 << 23,
+                        // highWaterMark: 1 << 23,
                         liveBuffer: 2000,
                         // dlChunkSize: 1 << 12,
                     });
