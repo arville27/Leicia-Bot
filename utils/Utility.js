@@ -16,8 +16,12 @@ function matchUrlGroups(url) {
  * @param {string} url
  */
 function isValidUrl(url) {
-    const groups = url.match(urlRegex);
-    return groups ? true : false;
+    try {
+        new URL(url);
+        return true;
+    } catch (err) {
+        return false;
+    }
 }
 
 /**
