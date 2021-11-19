@@ -40,7 +40,7 @@ class Track {
                         filter: (format) => format.isHLS,
                         quality: 'highestaudio',
                         // highWaterMark: 1 << 23,
-                        liveBuffer: 2000,
+                        liveBuffer: 1000,
                         // dlChunkSize: 1 << 12,
                     });
 
