@@ -6,7 +6,7 @@ async function getPostData(url) {
         params: { url: url },
         headers: { 'X-API-Key': FacebookScrapperAPIKey },
     };
-    const BASE_URL = 'http://test.arv.cx/fb/';
+    const BASE_URL = 'http://api.arv.cx/fb/';
     const { data } = await axios.get(BASE_URL, PAYLOAD);
     return data;
 }
