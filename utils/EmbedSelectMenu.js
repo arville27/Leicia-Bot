@@ -2,8 +2,8 @@ const { MessageButton, MessageActionRow, CommandInteraction } = require('discord
 const resp = require('../responses/MusicCommandsResponse');
 const { embedResponse } = require('../utils/Utility');
 const { promisify } = require('util');
+const { bold } = require('@discordjs/builders');
 const wait = promisify(setTimeout);
-const play = require('../SlashCommands/music/play');
 
 /**
  * Creates a select menu embed
@@ -13,7 +13,7 @@ const play = require('../SlashCommands/music/play');
  * @param {number} timeout
  * @returns
  */
-const selectMenu = async (client, interaction, row) => {
+const selectMenu = async (client, interaction, row, onCollectCallback, isMusic = false, args) => {
     //has the interaction already been deferred? If not, defer the reply.
     if (interaction.deferred === false) {
         await interaction.deferReply();
@@ -37,6 +37,7 @@ const selectMenu = async (client, interaction, row) => {
             .catch(() => void 0);
         return false;
     };
+
     const collector = master.createMessageComponentCollector({
         filter,
         max: 1,
@@ -44,16 +45,14 @@ const selectMenu = async (client, interaction, row) => {
         componentType: 'SELECT_MENU',
     });
 
-    collector.on('collect', async (componentInteraction) => {
-        await play.run(client, componentInteraction, componentInteraction.values);
-    });
+    collector.on('collect', onCollectCallback);
 
     collector.on('end', async (collections) => {
         if (!master.deleted) {
-            const res =
-                collections.size > 0
-                    ? await resp.selectedMenuMessage(collections.first().values[0])
-                    : resp.timeoutHasBeenReached(120);
+            const embed = isMusic
+                ? await resp.selectedMenuMessage(collections.first().values[0])
+                : embedResponse({ msg: bold('Already selected'), color: '#0070eb' });
+            const res = collections.size > 0 ? embed : resp.timeoutHasBeenReached(120);
             await master
                 .edit({
                     embeds: [res],

@@ -11,6 +11,7 @@ const { embedResponse, reply } = require('../../utils/Utility');
 const resp = require('../../responses/MusicCommandsResponse');
 const selectMenu = require('../../utils/EmbedSelectMenu');
 const { TrackMetadata } = require('../../structures/TrackMetadata');
+const play = require('./play');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -56,6 +57,14 @@ module.exports = {
             return await reply(interaction, embedResponse(resp.others.noResultsFound));
         }
 
-        selectMenu(client, interaction, row);
+        selectMenu(
+            client,
+            interaction,
+            row,
+            async (componentInteraction) => {
+                await play.run(client, componentInteraction, componentInteraction.values);
+            },
+            true
+        );
     },
 };
