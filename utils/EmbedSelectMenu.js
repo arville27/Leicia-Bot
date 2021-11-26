@@ -49,10 +49,20 @@ const selectMenu = async (client, interaction, row, onCollectCallback, isMusic =
 
     collector.on('end', async (collections) => {
         if (!master.deleted) {
-            const embed = isMusic
-                ? await resp.selectedMenuMessage(collections.first().values[0])
-                : embedResponse({ msg: bold('Already selected'), color: '#0070eb' });
+            if (!isMusic)
+                return await master
+                    .edit({
+                        embeds: [
+                            embedResponse({ msg: bold('Already selected'), color: '#0072EB' }),
+                        ],
+                        components: [],
+                    })
+                    .then(async (master) => {
+                        await wait(5_000);
+                        await master.delete();
+                    });
             const res = collections.size > 0 ? embed : resp.timeoutHasBeenReached(120);
+            const embed = await resp.selectedMenuMessage(collections.first().values[0]);
             await master
                 .edit({
                     embeds: [res],
