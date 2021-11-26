@@ -13,7 +13,7 @@ const wait = promisify(setTimeout);
  * @param {number} timeout
  * @returns
  */
-const selectMenu = async (client, interaction, row, onCollectCallback, isMusic = false, args) => {
+const selectMenu = async (client, interaction, row, onCollectCallback, isMusic = false) => {
     //has the interaction already been deferred? If not, defer the reply.
     if (interaction.deferred === false) {
         await interaction.deferReply();

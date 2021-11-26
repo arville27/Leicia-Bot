@@ -35,7 +35,7 @@ const getResults = async (query, count = 3) => {
     const searchUrl = 'https://api.genius.com/search?q=';
     const reqUrl = `${searchUrl}${encodeURIComponent(query)}`;
     let { data } = await axios.get(`${reqUrl}&access_token=${apiKey}`);
-    if (data.response.hits.length === 0) return null;
+    if (data.response.hits.length === 0) return [];
     const results = data.response.hits.slice(0, count).map((val) => {
         const { full_title, url, primary_artist } = val.result;
         return {

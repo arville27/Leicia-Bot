@@ -17,8 +17,10 @@ const Provider = {
 const searchLyrics = async (query, Provider) => {
     let results = [];
     for (const prov of Provider) {
-        results = results.concat(await prov.getResults(query));
+        const indivProvRes = await prov.getResults(query);
+        results = results.concat(indivProvRes);
     }
+    if (results.length == 0) throw 'No lyrics found';
     return results;
 };
 
