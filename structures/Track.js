@@ -1,8 +1,7 @@
 const { createAudioResource, StreamType, demuxProbe } = require('@discordjs/voice');
 const { TrackMetadata } = require('./TrackMetadata');
 const ytcore = require('ytdl-core');
-const ytexec = require('youtube-dl-exec').raw;
-// const { ytCookies } = require('../config.json');
+const youtubeDlExec = require('youtube-dl-exec').exec;
 /**
  * A Track represents information about a YouTube video (in this context) that can be added to a queue.
  * It contains the title and URL of the video, as well as functions onStart, onFinish, onError, that act
@@ -57,7 +56,7 @@ class Track {
             });
         }
         return new Promise((resolve, reject) => {
-            const process = ytexec(
+            const process = youtubeDlExec(
                 this.url,
                 {
                     o: '-',
