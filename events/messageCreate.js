@@ -1,22 +1,36 @@
 const { MessageEmbed } = require('discord.js');
 const client = require('../index');
-const { isValidUrl, isUrl } = require('../utils/Utility');
+const { isValidUrl, isUrl, embedResponse } = require('../utils/Utility');
 const { getPostData } = require('../utils/Facebook');
+const { bold } = require('@discordjs/builders');
 
 client.on('messageCreate', async (message) => {
     const firstWord = message.content.split()[0];
     if (!message.author.bot && isValidUrl(firstWord) && isUrl(['facebook', 'fb'], firstWord)) {
         const post = await getPostData(firstWord).catch((error) => console.log(error));
-        if (!post) return;
-        const embed = new MessageEmbed()
-            .setTitle(post.username)
-            .setDescription(post.post_text)
-            .setColor('#3B5998')
-            .addFields(
-                { name: 'Likes :thumbsup:', value: `${post.likes}`, inline: true },
-                { name: 'Shares :mega:', value: `${post.shares}`, inline: true },
-                { name: 'Comments :speech_left:', value: `${post.comments}`, inline: true }
-            );
+        if (!post) {
+            return await message.channel.send({
+                embeds: [
+                    embedResponse({ msg: bold('Failed to fetch post content'), color: '#eb0000' }),
+                ],
+            });
+            // return;
+        }
+
+        let embed = null;
+        try {
+            embed = new MessageEmbed()
+                .setTitle(post.username)
+                .setDescription(post.post_text)
+                .setColor('#3B5998')
+                .addFields(
+                    { name: 'Likes :thumbsup:', value: `${post.likes}`, inline: true },
+                    { name: 'Shares :mega:', value: `${post.shares}`, inline: true },
+                    { name: 'Comments :speech_left:', value: `${post.comments}`, inline: true }
+                );
+        } catch (error) {
+            console.log('Facebook embed\n', error);
+        }
 
         if (post.user_url) embed.setURL(post.user_url);
         if (post.images.length > 0) embed.setImage(post.images[0]);

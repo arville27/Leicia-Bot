@@ -8,7 +8,8 @@ async function getPostData(url) {
     };
     const BASE_URL = 'http://api.arv.cx/fb/';
     const { data } = await axios.get(BASE_URL, PAYLOAD);
-    return data;
+    if (data.status == 204) return null;
+    return data.data;
 }
 
 module.exports = { getPostData };
