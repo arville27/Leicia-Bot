@@ -61,8 +61,10 @@ const selectMenu = async (client, interaction, row, onCollectCallback, isMusic =
                         await wait(5_000);
                         await master.delete();
                     });
-            const res = collections.size > 0 ? embed : resp.timeoutHasBeenReached(120);
-            const embed = await resp.selectedMenuMessage(collections.first().values[0]);
+            const res =
+                collections.size > 0
+                    ? await resp.selectedMenuMessage(collections.first().values[0])
+                    : resp.timeoutHasBeenReached(120);
             await master
                 .edit({
                     embeds: [res],
