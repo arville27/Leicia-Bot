@@ -41,7 +41,7 @@ const selectMenu = async (client, interaction, row, onCollectCallback, isMusic =
     const collector = master.createMessageComponentCollector({
         filter,
         max: 1,
-        time: 10 * 1000,
+        time: 120 * 1000,
         componentType: 'SELECT_MENU',
     });
 
