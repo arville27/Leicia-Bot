@@ -302,7 +302,6 @@ class MusicSubscription {
         this.queueLock = true;
         try {
             // Attempt to convert the Track into an AudioResource (i.e. start streaming the video)
-            // console.log(trackToPlay);
             const resource = await trackToPlay.createAudioResource();
             this.audioPlayer.play(resource);
             this.queueLock = false;

@@ -50,7 +50,6 @@ class Track {
                         })
                     );
                 } catch (error) {
-                    console.log(error);
                     reject(error);
                 }
             });

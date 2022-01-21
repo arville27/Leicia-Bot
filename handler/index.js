@@ -35,8 +35,6 @@ module.exports = async (client) => {
     slashCommands.forEach((value) => {
         const file = require(value);
         if (!file?.name) return;
-        console.log(`${file.name} command loaded`);
-        // if (file.userPermissions) file.defaultPermission = false;
         client.slashCommands.set(file.name, file);
 
         arrayOfSlashCommands.push(file);
@@ -47,7 +45,7 @@ module.exports = async (client) => {
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
         const ids = Object.values(guildsId);
-        console.log(ids);
+        stdLog(0, { extra: `Serving [${ids}]` });
         ids.forEach(async (guildId) => {
             const guild = client.guilds.cache.get(guildId);
             if (!guild) return;
@@ -62,9 +60,6 @@ module.exports = async (client) => {
                     const roles = guild.roles.cache.filter(
                         (x) => x.permissions.has(permissions) && !x.managed
                     );
-                    // roles.forEach((role) => {
-                    //     console.log(role.name);
-                    // });
                     return roles;
                 };
 
@@ -95,8 +90,6 @@ module.exports = async (client) => {
                 guild.commands.permissions.set({ fullPermissions });
             });
         });
-        // const tks = client.guilds.cache.get('425654507607687178');
-        // await tks.commands.set([]);
     });
 
     // mongoose

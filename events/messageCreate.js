@@ -16,7 +16,6 @@ client.on('messageCreate', async (message) => {
                     embedResponse({ msg: bold('Failed to fetch post content'), color: '#eb0000' }),
                 ],
             });
-            // return;
         }
 
         let embed = null;
