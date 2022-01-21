@@ -102,7 +102,10 @@ module.exports = async (client) => {
     };
     mongoose
         .connect(mongooseConnectionString, auth)
-        .then(() => stdLog(0, { extra: 'Connected to mongodb' }))
+        .then(() => {
+            client.isDatabaseConnected = true;
+            stdLog(0, { extra: 'Connected to mongodb' });
+        })
         .catch(() => {
             client.isDatabaseConnected = false;
             stdLog(2, { extra: 'Failed to connect to mongodb' });
