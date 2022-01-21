@@ -6,8 +6,8 @@ const resp = require('../../responses/MusicCommandsResponse');
 
 module.exports = {
     ...new SlashCommandBuilder()
-        .setName('change')
-        .setDescription('Change to any track in the queue')
+        .setName('Move')
+        .setDescription('Move to any track in the queue')
         .addIntegerOption((option) =>
             option.setName('no').setDescription('Track number you want to play').setRequired(true)
         ),
