@@ -6,7 +6,12 @@ const { bold } = require('@discordjs/builders');
 
 client.on('messageCreate', async (message) => {
     const firstWord = message.content.split()[0];
-    if (!message.author.bot && isValidUrl(firstWord) && isUrl(['facebook', 'fb'], firstWord)) {
+    if (
+        client.config.FacebookScrapperAPIKey &&
+        !message.author.bot &&
+        isValidUrl(firstWord) &&
+        isUrl(['facebook', 'fb'], firstWord)
+    ) {
         const post = await getPostData(firstWord).catch((error) => {
             stdLog(2, { extra: 'FacebookScraper API failed to fetch data', err: error });
         });
