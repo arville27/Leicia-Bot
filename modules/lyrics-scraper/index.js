@@ -20,7 +20,7 @@ const searchLyrics = async (query, Provider) => {
         const indivProvRes = await prov.getResults(query);
         results = results.concat(indivProvRes);
     }
-    if (results.length == 0) throw 'No lyrics found';
+    if (results.length == 0) throw Error('No lyrics found');
     return results;
 };
 

@@ -3,20 +3,24 @@ const cheerio = require('cheerio');
 const { getSources, extractUrl } = require('../lib/cse');
 
 const extractLyrics = async (url) => {
-    const { data } = await axios.get(url);
-    const $ = cheerio.load(data);
-    const lyrics = [];
-    $('div[id="Romaji"]')
-        .find('.olyrictext')
-        .children()
-        .each((_, el) => {
-            lyrics.push(
-                $(el)
-                    .html()
-                    .replace(/\s?<br>\s?/g, '\n')
-            );
-        });
-    return lyrics.join('\n');
+    try {
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
+        const lyrics = [];
+        $('div[id="Romaji"]')
+            .find('.olyrictext')
+            .children()
+            .each((_, el) => {
+                lyrics.push(
+                    $(el)
+                        .html()
+                        .replace(/\s?<br>\s?/g, '\n')
+                );
+            });
+        return lyrics.join('\n');
+    } catch (error) {
+        console.log('extractLyricsMethod', error);
+    }
 };
 
 const extractInfo = (url) => {
@@ -41,18 +45,23 @@ const isValidLyric = (url) => {
 const getResults = async (query) => {
     const CSE_ID = '5ddc5d24693849251';
     const srcs = await getSources(query, CSE_ID);
-    const results = srcs
-        .map((src) => extractUrl(src))
-        .filter((url) => isValidLyric(url))
-        .map((url) => {
-            return {
-                ...extractInfo(url),
-                lyrics: extractLyrics(url),
-                src: url,
-                provider: 'LyricalNonsense',
-            };
-        });
-    return results;
+    try {
+        const results = srcs
+            .map((src) => extractUrl(src))
+            .filter((url) => isValidLyric(url))
+            .map((url) => {
+                console.log(url);
+                return {
+                    ...extractInfo(url),
+                    lyrics: extractLyrics(url),
+                    src: url,
+                    provider: 'LyricalNonsense',
+                };
+            });
+        return results;
+    } catch (error) {
+        return [];
+    }
 };
 
 module.exports = {

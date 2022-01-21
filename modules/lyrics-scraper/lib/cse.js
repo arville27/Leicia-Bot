@@ -23,7 +23,7 @@ const getSources = async (keyword, cseId) => {
     if (results.length == 1 && cheerio.load(results[0]).text().indexOf('http') === -1) {
         return [];
     }
-    return results.map((x) => cheerio.load(x));
+    return results.filter((x) => !x.includes('gs-spelling')).map((x) => cheerio.load(x));
 };
 
 const extractUrl = (src) => {
