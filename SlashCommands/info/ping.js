@@ -15,9 +15,7 @@ module.exports = {
 
         const embed = new MessageEmbed().addFields({
             name: '🏓 Pong!',
-            value: `Latency is ${Date.now() - interaction.createdTimestamp} ms\nAPI Latency! (${
-                client.ws.ping
-            } ms)`,
+            value: `API Latency! (${client.ws.ping} ms)`,
         });
         await reply(interaction, embed);
     },
