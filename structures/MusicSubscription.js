@@ -156,16 +156,18 @@ class MusicSubscription {
     shuffle() {
         this.queueLock = true;
         const size = this.queue.length;
-        let currPlay = this.current;
+        let { index, track } = this.getCurrentTrack();
         for (let i = 0; i < size; i++) {
             const a = Math.floor(Math.random() * size);
             const b = Math.floor(Math.random() * size);
-            if (a === currPlay) currPlay = b;
-            else if (b === currPlay) currPlay = a;
+            if (a === index) index = b;
+            else if (b === index) index = a;
             [this.queue[a], this.queue[b]] = [this.queue[b], this.queue[a]];
         }
-        [this.queue[0], this.queue[currPlay]] = [this.queue[currPlay], this.queue[0]];
-        this.current = 0;
+        if (track) {
+            [this.queue[0], this.queue[index]] = [this.queue[index], this.queue[0]];
+            this.current = 0;
+        }
         this.queueLock = false;
     }
 
