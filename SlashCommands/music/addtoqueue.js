@@ -23,6 +23,11 @@ module.exports = {
     run: async (client, interaction, args) => {
         await interaction.deferReply();
 
+        // check if connected to db
+        if (!client.isDatabaseConnected) {
+            return await reply(interaction, embedResponse(resp.others.serverError));
+        }
+
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await reply(interaction, embedResponse(resp.others.notInVoiceChannel));

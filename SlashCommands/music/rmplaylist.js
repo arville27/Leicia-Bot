@@ -20,6 +20,11 @@ module.exports = {
     run: async (client, interaction, args) => {
         await interaction.deferReply();
 
+        // check if connected to db
+        if (!client.isDatabaseConnected) {
+            return await reply(interaction, embedResponse(resp.others.serverError));
+        }
+
         const playlistName = interaction.options.getString('name');
         const query = { author: interaction.user.id, _id: playlistName };
 

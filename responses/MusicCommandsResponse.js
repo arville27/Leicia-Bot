@@ -190,6 +190,10 @@ const others = {
         msg: "You don't have permission to use this command!",
         color: '#eb0000',
     },
+    serverError: {
+        msg: bold('Server error, try again later'),
+        color: '#eb0000',
+    },
     queueFinished: {
         msg: ':musical_note: **Queue finished**',
         color: '#eb0000',
