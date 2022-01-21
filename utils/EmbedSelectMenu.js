@@ -41,37 +41,35 @@ const selectMenu = async (client, interaction, row, onCollectCallback, isMusic =
     const collector = master.createMessageComponentCollector({
         filter,
         max: 1,
-        time: 120 * 1000,
+        time: 10 * 1000,
         componentType: 'SELECT_MENU',
     });
 
     collector.on('collect', onCollectCallback);
 
     collector.on('end', async (collections) => {
-        if (!master.deleted) {
-            if (!isMusic)
-                return await master
-                    .edit({
-                        embeds: [
-                            embedResponse({ msg: bold('Already selected'), color: '#0072EB' }),
-                        ],
-                        components: [],
-                    })
-                    .then(async (master) => {
-                        await wait(5_000);
-                        await master.delete();
-                    });
-            const res =
-                collections.size > 0
-                    ? await resp.selectedMenuMessage(collections.first().values[0])
-                    : resp.timeoutHasBeenReached(120);
-            if (!master.deleted) {
-                await master.edit({
-                    embeds: [res],
+        if (!isMusic) {
+            return await master
+                .edit({
+                    embeds: [embedResponse({ msg: bold('Already selected'), color: '#0072EB' })],
                     components: [],
+                })
+                .then(async (master) => {
+                    await wait(5_000);
+                    await master.delete().catch(() => void 0);
                 });
-            }
         }
+        const res =
+            collections.size > 0
+                ? await resp.selectedMenuMessage(collections.first().values[0])
+                : resp.timeoutHasBeenReached(120);
+
+        await master
+            .edit({
+                embeds: [res],
+                components: [],
+            })
+            .catch(() => void 0);
     });
 
     return master;

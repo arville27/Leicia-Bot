@@ -74,9 +74,7 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
     });
 
     collector.on('end', async () => {
-        if (!curPage.deleted) {
-            await curPage.delete().catch(() => void 0);
-        }
+        await curPage.delete().catch(() => void 0);
     });
 
     return curPage;
