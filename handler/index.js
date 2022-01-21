@@ -3,6 +3,7 @@ const { promisify } = require('util');
 const { Client } = require('discord.js');
 const mongoose = require('mongoose');
 const { mongooseConnectionString, mongoUser, mongoPass, guildsId } = require('../config.json');
+const { stdLog } = require('../utils/Utility');
 
 const globPromise = promisify(glob);
 
@@ -108,6 +109,9 @@ module.exports = async (client) => {
     };
     mongoose
         .connect(mongooseConnectionString, auth)
-        .then(() => console.log('Connected to mongodb'))
-        .catch((err) => console.log('Failed to connect to mongodb'));
+        .then(() => stdLog(0, { extra: 'Connected to mongodb' }))
+        .catch(() => {
+            client.databaseConnected = false;
+            stdLog(2, { extra: 'Failed to connect to mongodb' });
+        });
 };

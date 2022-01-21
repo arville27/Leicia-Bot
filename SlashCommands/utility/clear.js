@@ -1,7 +1,6 @@
 const { Client, CommandInteraction } = require('discord.js');
 const { SlashCommandBuilder, inlineCode } = require('@discordjs/builders');
-const { embedResponse, reply } = require('../../utils/Utility');
-const resp = require('../../responses/MusicCommandsResponse');
+const { embedResponse, reply, stdLog } = require('../../utils/Utility');
 
 module.exports = {
     ...new SlashCommandBuilder().setName('clear').setDescription('Delete bot responses'),
@@ -34,12 +33,12 @@ module.exports = {
                         (Date.now() - message.createdTimestamp) / (1000 * 60 * 60 * 24) < 14
                 )
             )
-            .catch((err) => console.warn('Error while fetching messages'));
+            .catch(() => stdLog(1, { extra: '[clear] Error while fetching messages' }));
 
         try {
             await interaction.channel.bulkDelete(messages);
         } catch (error) {
-            console.log('[ERROR] There is a message that cannot be deleted');
+            stdLog(1, { extra: '[clear] There is a message that cannot be deleted' });
         }
         await reply(
             interaction,

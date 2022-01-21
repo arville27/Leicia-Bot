@@ -3,7 +3,7 @@ const { SlashCommandBuilder, bold } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const { Track } = require('../../structures/Track');
 const { parsePlaylist, parseAlbum, parseTrack, whatIsIt } = require('../../utils/SpotifyTrack');
-const { isValidUrl, isUrl, embedResponse, reply } = require('../../utils/Utility');
+const { isValidUrl, isUrl, embedResponse, reply, stdLog } = require('../../utils/Utility');
 const { mc } = require('../../utils/MusicCommands');
 const resp = require('../../responses/MusicCommandsResponse');
 
@@ -27,13 +27,6 @@ module.exports = {
         // check if already defferd by search command
         if (!interaction.deferred) await interaction.deferReply();
 
-        try {
-            const log = `[${interaction.guild.name}][${interaction.user.tag}] play ${args}`;
-            console.log(log);
-        } catch (error) {
-            console.log('Error trying to print log message');
-        }
-
         // check if user in voice channel
         if (interaction.member instanceof GuildMember && !interaction.member.voice.channel) {
             return await reply(interaction, embedResponse(resp.others.notInVoiceChannel));
@@ -50,7 +43,7 @@ module.exports = {
         try {
             await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
         } catch (error) {
-            console.warn(error);
+            stdLog(2, { extra: "[play] Can't join to voice channel", err: error });
             return await reply(interaction, embedResponse(resp.others.failedJoinVoiceChannel));
         }
 
@@ -73,7 +66,10 @@ module.exports = {
                             subscription.queue.length + 1
                         );
                     } catch (error) {
-                        console.log(error, '\n');
+                        stdLog(2, {
+                            extra: '[play]',
+                            err: error,
+                        });
                     }
                 } else if (type.album) {
                     try {
@@ -90,7 +86,10 @@ module.exports = {
 
                         mediaInfo = resp.playlistEmbed(interaction, playlistInfo);
                     } catch (error) {
-                        console.log(error, '\n');
+                        stdLog(2, {
+                            extra: '[play]',
+                            err: error,
+                        });
                     }
                 } else if (type.playlist) {
                     try {
@@ -107,7 +106,10 @@ module.exports = {
 
                         mediaInfo = resp.playlistEmbed(interaction, playlistInfo);
                     } catch (error) {
-                        console.log(error, '\n');
+                        stdLog(2, {
+                            extra: '[play]',
+                            err: error,
+                        });
                     }
                 }
             } else if (isUrl(['youtube', 'youtu'], param)) {
@@ -128,7 +130,10 @@ module.exports = {
 
                         mediaInfo = resp.playlistEmbed(interaction, playlistInfo);
                     } catch (error) {
-                        console.log(error, '\n');
+                        stdLog(2, {
+                            extra: '[play]',
+                            err: error,
+                        });
                     }
                 } else {
                     try {
@@ -143,7 +148,10 @@ module.exports = {
                             subscription.queue.length + 1
                         );
                     } catch (error) {
-                        console.log(error);
+                        stdLog(2, {
+                            extra: '[play] Failed to add track',
+                            err: error,
+                        });
                         return await reply(
                             interaction,
                             embedResponse({
@@ -171,7 +179,10 @@ module.exports = {
                     subscription.queue.length + 1
                 );
             } catch (error) {
-                console.log(error, '\n');
+                stdLog(2, {
+                    extra: '[play]',
+                    err: error,
+                });
             }
         }
 

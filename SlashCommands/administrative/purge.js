@@ -1,6 +1,6 @@
 const { Client, CommandInteraction } = require('discord.js');
 const { SlashCommandBuilder, inlineCode } = require('@discordjs/builders');
-const { embedResponse, reply } = require('../../utils/Utility');
+const { embedResponse, reply, stdLog } = require('../../utils/Utility');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -47,7 +47,7 @@ module.exports = {
             messages = await interaction.channel.messages
                 .fetch({ limit: 100 })
                 .then((messages) => messages.filter(filterMessage))
-                .catch((err) => console.warn('Error while fetching messages'));
+                .catch(() => stdLog(1, { extra: '[purge] Error while fetching messages' }));
             amount = 0;
         } else if (amount < 100) {
             messages = await interaction.channel.messages
@@ -66,8 +66,9 @@ module.exports = {
         try {
             await interaction.channel.bulkDelete(messages);
         } catch (error) {
-            console.log('[ERROR] There is a message that cannot be deleted');
+            stdLog(1, { extra: '[purge] There is a message that cannot be deleted' });
         }
+
         if (canBeDeleted < amount) {
             await reply(
                 interaction,

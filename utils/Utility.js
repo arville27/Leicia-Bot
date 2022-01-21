@@ -1,4 +1,4 @@
-const { MessageEmbed, CommandInteraction } = require('discord.js');
+const { MessageEmbed, CommandInteraction, Message } = require('discord.js');
 
 const urlRegex = /([a-z]+:\/\/)(?:([a-z0-9]+)\.)?([a-z0-9]+)\.([a-z]{2,})/;
 /**
@@ -68,4 +68,48 @@ async function reply(interaction, embed) {
     }
 }
 
-module.exports = { matchUrlGroups, isValidUrl, isUrl, embedResponse, truncateString, reply };
+/**
+ * @typedef {interaction: CommandInteraction, cmd: Object, args: Array, extra: Object, err: any} logArgs
+ * @param {Number} level 0: INFO, 1: WARN, 2:ERROR
+ * @param {logArgs} logArgs
+ */
+function stdLog(level, { interaction, cmd, args, extra, err }) {
+    let logLevel = 'INFO';
+    if (level && level === 1) logLevel = 'WARN';
+    else if (level && level === 2) logLevel = 'ERROR';
+    let logInformation = `[${new Date().toLocaleString()}][${logLevel}]`;
+
+    if (interaction) {
+        logInformation += `[${interaction.guild.name} :: ${interaction.user.tag}]`;
+    } else {
+        logInformation += '[SYSTEM]';
+    }
+
+    if (cmd) {
+        logInformation += ` ${interaction.commandName}`;
+        if (args) logInformation += ` ${args}`;
+        if (!interaction.member.permissions.has(cmd.userPermissions || [])) {
+            logInformation += ` (Insufficent user permission: ${cmd.userPermissions})`;
+        }
+    }
+
+    if (extra) {
+        logInformation += ` ${extra}`;
+    }
+
+    if (err) {
+        logInformation += `\n${err}`;
+    }
+
+    console.log(logInformation);
+}
+
+module.exports = {
+    matchUrlGroups,
+    isValidUrl,
+    isUrl,
+    embedResponse,
+    truncateString,
+    reply,
+    stdLog,
+};

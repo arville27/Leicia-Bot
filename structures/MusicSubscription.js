@@ -8,6 +8,7 @@ const {
 } = require('@discordjs/voice');
 const { Track } = require('./Track');
 const { wait, createCancellableSignal } = require('../utils/CancellablePromise');
+const { stdLog } = require('../utils/Utility');
 /**
  * A MusicSubscription exists for each active VoiceConnection. Each subscription has its own audio player and queue,
  * and it also attaches logic to the audio player and voice connection for error handling and reconnection logic.
@@ -115,7 +116,9 @@ class MusicSubscription {
                         try {
                             this.voiceConnection.destroy();
                         } catch (err) {
-                            console.log('[IDLE] Voice connection already destroyed');
+                            stdLog(1, {
+                                extra: '[MusicSubscription] Voice connection already destroyed',
+                            });
                         }
                         this.destroyed = true;
                     }
@@ -141,7 +144,9 @@ class MusicSubscription {
                     try {
                         this.voiceConnection.destroy();
                     } catch (err) {
-                        console.log('[PAUSED] Voice connection already destroyed');
+                        stdLog(1, {
+                            extra: '[MusicSubscription] Voice connection already destroyed',
+                        });
                     }
                     this.destroyed = true;
                 }

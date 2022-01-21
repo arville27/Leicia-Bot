@@ -1,4 +1,5 @@
 const http = require('http');
+const { stdLog } = require('./utils/Utility');
 
 class HealthCheckServer {
     constructor(port) {
@@ -23,15 +24,19 @@ class HealthCheckServer {
             }
 
             res.on('error', (err) => {
-                console.error('Health check API server error');
-                console.error(err);
+                stdLog(2, {
+                    extra: 'Health check API server error',
+                    err: err,
+                });
             });
         });
     }
 
     start() {
         this.server.listen(this.port, () => {
-            console.log(`Health check API server is up and listening on port ${this.port}`);
+            stdLog(0, {
+                extra: `Health check API server is up and listening on port ${this.port}`,
+            });
         });
     }
 }

@@ -1,13 +1,15 @@
 const { MessageEmbed } = require('discord.js');
 const client = require('../index');
-const { isValidUrl, isUrl, embedResponse } = require('../utils/Utility');
+const { isValidUrl, isUrl, embedResponse, stdLog } = require('../utils/Utility');
 const { getPostData } = require('../utils/Facebook');
 const { bold } = require('@discordjs/builders');
 
 client.on('messageCreate', async (message) => {
     const firstWord = message.content.split()[0];
     if (!message.author.bot && isValidUrl(firstWord) && isUrl(['facebook', 'fb'], firstWord)) {
-        const post = await getPostData(firstWord).catch((error) => console.log(error));
+        const post = await getPostData(firstWord).catch((error) => {
+            stdLog(2, { extra: 'FacebookScraper API failed to fetch data', err: error });
+        });
         if (!post) {
             return await message.channel.send({
                 embeds: [
@@ -29,7 +31,7 @@ client.on('messageCreate', async (message) => {
                     { name: 'Comments :speech_left:', value: `${post.comments}`, inline: true }
                 );
         } catch (error) {
-            console.log('Facebook embed\n', error);
+            stdLog(1, { extra: 'Facebook embed error', err: error });
         }
 
         if (post.user_url) embed.setURL(post.user_url);

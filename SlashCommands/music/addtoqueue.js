@@ -1,7 +1,7 @@
 const { Client, CommandInteraction, GuildMember } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { entersState, VoiceConnectionStatus } = require('@discordjs/voice');
-const { embedResponse, reply } = require('../../utils/Utility');
+const { embedResponse, reply, stdLog } = require('../../utils/Utility');
 const resp = require('../../responses/MusicCommandsResponse');
 const { mc } = require('../../utils/MusicCommands');
 const SavedPlaylist = require('../../models/SavedPlaylist');
@@ -39,14 +39,14 @@ module.exports = {
         try {
             await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
         } catch (error) {
-            console.warn(error);
+            stdLog(2, { extra: "[addtoqueue] Can't join to voice channel", err: error });
             return await reply(interaction, embedResponse(resp.others.failedJoinVoiceChannel));
         }
 
         const playlistName = interaction.options.getString('name');
         const query = { author: interaction.user.id, _id: playlistName };
-        const playlist = await SavedPlaylist.findOne(query).catch(async (err) => {
-            console.log(err);
+        const playlist = await SavedPlaylist.findOne(query).catch(async (error) => {
+            stdLog(2, { extra: "[addtoqueue] Can't find playlist in db", err: error });
             return await reply(interaction, embedResponse(resp.others.generalError));
         });
 

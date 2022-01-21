@@ -1,6 +1,6 @@
 const client = require('../index');
 const resp = require('../responses/MusicCommandsResponse');
-const { embedResponse, reply } = require('../utils/Utility');
+const { embedResponse, reply, stdLog } = require('../utils/Utility');
 
 client.on('interactionCreate', async (interaction) => {
     // Slash Command Handling
@@ -18,6 +18,8 @@ client.on('interactionCreate', async (interaction) => {
             } else if (option.value) args.push(option.value);
         }
         interaction.member = interaction.guild.members.cache.get(interaction.user.id);
+
+        stdLog(0, { interaction, cmd, args });
 
         if (!interaction.member.permissions.has(cmd.userPermissions || []))
             return await reply(interaction, embedResponse(resp.others.insufficentPerm));
