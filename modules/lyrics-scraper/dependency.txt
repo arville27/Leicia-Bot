@@ -1,3 +1,0 @@
-cheerio
-puppeteer
-axios
