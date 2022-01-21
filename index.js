@@ -1,5 +1,6 @@
 const { Client, Collection, Intents } = require('discord.js');
 const { DiscordTogether } = require('discord-together');
+const { HealthCheckServer } = require('./healthcheckserver');
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
@@ -16,5 +17,6 @@ client.discordTogether = new DiscordTogether(client);
 
 // Initializing the project
 require('./handler')(client);
+new HealthCheckServer(3090).start()
 
 client.login(client.config.token);
