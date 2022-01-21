@@ -65,12 +65,12 @@ const selectMenu = async (client, interaction, row, onCollectCallback, isMusic =
                 collections.size > 0
                     ? await resp.selectedMenuMessage(collections.first().values[0])
                     : resp.timeoutHasBeenReached(120);
-            await master
-                .edit({
+            if (!master.deleted) {
+                await master.edit({
                     embeds: [res],
                     components: [],
-                })
-                .catch(() => stdLog(1, { extra: '[EmbedSelectMenu] Select menu already deleted' }));
+                });
+            }
         }
     });
 
