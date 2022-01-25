@@ -104,17 +104,15 @@ const trackMetadataFrom = async (query, allowLive = true) => {
     const res = await search(query);
     if (!res.videos.length) throw 'No results found';
 
-    async function findAsync(arr, asyncCallback) {
-        const promises = arr.map(asyncCallback);
-        const results = await Promise.all(promises);
-        const index = results.findIndex((result) => result);
-        return arr[index];
+    let video = null;
+    for (const vid of res.videos) {
+        if (allowLive ? vid.duration >= 0 : vid.duration > 0) {
+            video = vid;
+            break;
+        }
     }
 
-    const video = await findAsync(res.videos, async (video) => {
-        const { status } = await playability(video.url);
-        return (allowLive ? video.duration >= 0 : video.duration > 0) && status;
-    });
+    if (!video) throw 'No results found';
 
     return new TrackMetadata({
         title: video.title,
@@ -184,15 +182,6 @@ async function TrackMetadataFromYTPlaylist(playlistId) {
     });
 
     return { playlistInfo, trackList };
-}
-
-async function playability(url) {
-    const res = await getVideoInfo(url);
-    const playability = res.json.playabilityStatus.status === 'OK';
-    return {
-        status: playability,
-        reason: !playability ? res.json.playabilityStatus.reason : '',
-    };
 }
 
 const mc = {
