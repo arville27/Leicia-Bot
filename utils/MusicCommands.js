@@ -103,10 +103,19 @@ const isYTPlaylist = async (url) => {
 const trackMetadataFrom = async (query, allowLive = true) => {
     const res = await search(query);
     if (!res.videos.length) throw 'No results found';
-    const video = res.videos.find(async (video) => {
+
+    async function findAsync(arr, asyncCallback) {
+        const promises = arr.map(asyncCallback);
+        const results = await Promise.all(promises);
+        const index = results.findIndex((result) => result);
+        return arr[index];
+    }
+
+    const video = await findAsync(res.videos, async (video) => {
         const { status } = await playability(video.url);
         return (allowLive ? video.duration >= 0 : video.duration > 0) && status;
     });
+
     return new TrackMetadata({
         title: video.title,
         url: video.url,
