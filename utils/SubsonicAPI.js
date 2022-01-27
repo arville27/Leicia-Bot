@@ -1,5 +1,5 @@
 const axios = require('axios').default;
-const { isValidUrl } = require('../utils/Utility');
+const { isValidUrl, stdLog } = require('../utils/Utility');
 const crypto = require('crypto');
 
 const SUBSONIC_API_VERSION = '1.1610';
@@ -55,6 +55,14 @@ class SubsonicAPI {
 
     /**
      *
+     * @param {String} id Subsonic AlbumID
+     */
+    async getAlbum(id) {
+        return this.apiCall('getAlbum', { id: id });
+    }
+
+    /**
+     *
      * @param {String} string
      * @returns MD5 Hash hex encoded string
      */
@@ -68,18 +76,25 @@ class SubsonicAPI {
      * @param {Object} extraParam Extra query parameter
      */
     async apiCall(endpoint, extraParam = {}) {
-        const { data } = await axios.get(this.base + '/' + endpoint, {
-            params: {
-                ...this.queryParams,
-                ...this.generateToken(),
-                ...extraParam,
-            },
-        });
-        const result = data['subsonic-response'];
+        try {
+            const { data } = await axios.get(this.base + '/' + endpoint, {
+                params: {
+                    ...this.queryParams,
+                    ...this.generateToken(),
+                    ...extraParam,
+                },
+            });
+            const result = data['subsonic-response'];
 
-        if (result.status != 'ok')
-            throw Error(`\nCode: ${result.error.code}\nMessage: ${result.error.message}`);
-        return data['subsonic-response'];
+            if (result.status != 'ok')
+                throw Error(`\nCode: ${result.error.code}\nMessage: ${result.error.message}`);
+            return data['subsonic-response'];
+        } catch (error) {
+            stdLog(2, {
+                extra: '[SubsonicAPI] Error while sending request to the server',
+                err: error,
+            });
+        }
     }
 }
 

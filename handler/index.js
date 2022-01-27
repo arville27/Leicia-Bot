@@ -92,6 +92,21 @@ module.exports = async (client) => {
         });
     });
 
+    // subsonic
+    client.subsonic
+        .pingServer()
+        .then((res) => {
+            if (res.status === 'ok')
+                stdLog(0, { extra: 'Successfully connected to SubsonicAPI Server' });
+            else {
+                stdLog(1, { extra: 'Failed to connected to SubsonicAPI Server' });
+                client.subsonic = undefined;
+            }
+        })
+        .catch(() => {
+            client.subsonic = undefined;
+        });
+
     // mongoose
     if (!mongooseConnectionString) return;
 
