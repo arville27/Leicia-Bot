@@ -52,7 +52,7 @@ function embedResponse({ msg, color }) {
  * @returns
  */
 function truncateString(str, max) {
-    return `${str.substr(0, max)}${str.length > max ? '...' : ''}`;
+    return `${str.slice(0, max)}${str.length > max ? '...' : ''}`;
 }
 
 /**
