@@ -100,7 +100,7 @@ async function selectedMenuMessage(url) {
 }
 
 /**
- * @param {Number} length in seconds
+ * @param {Number} length length in seconds
  */
 function timeoutHasBeenReached(length) {
     return new MessageEmbed()

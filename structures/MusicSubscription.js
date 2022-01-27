@@ -176,6 +176,10 @@ class MusicSubscription {
         this.queueLock = false;
     }
 
+    /**
+     *
+     * @param {Number} trackNumber Track Number in queue
+     */
     removeTrack(trackNumber) {
         this.queue = this.queue.filter((_, i) => i !== trackNumber - 1);
 
@@ -244,6 +248,10 @@ class MusicSubscription {
         }
     }
 
+    /**
+     *
+     * @param {Number} index Track index
+     */
     changeTrack(index) {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Paused) {
             this.current = index - 2;

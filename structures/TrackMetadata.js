@@ -1,3 +1,7 @@
+/**
+ * Serializable class that represent Track for storage purposes
+ */
+
 class TrackMetadata {
     /**
      *
