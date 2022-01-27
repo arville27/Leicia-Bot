@@ -6,6 +6,7 @@ const { parsePlaylist, parseAlbum, parseTrack, whatIsIt } = require('../../utils
 const { isValidUrl, isUrl, embedResponse, reply, stdLog } = require('../../utils/Utility');
 const { mc } = require('../../utils/MusicCommands');
 const resp = require('../../responses/MusicCommandsResponse');
+const { parsePlaylistSub } = require('../../utils/SubsonicTrack');
 
 module.exports = {
     ...new SlashCommandBuilder()
@@ -162,6 +163,29 @@ module.exports = {
                             })
                         );
                     }
+                }
+            } else if (
+                client.subsonic &&
+                isUrl(new URL(client.subsonic.host).hostname.split('.'), param)
+            ) {
+                try {
+                    const { playlistInfo, trackList } = await parsePlaylistSub(
+                        client.subsonic,
+                        param
+                    );
+
+                    trackList.forEach((track) => {
+                        trackPlaylist.push(
+                            new Track(track, mc.trackInfoMethods(subscription, interaction, track))
+                        );
+                    });
+
+                    mediaInfo = resp.playlistEmbed(interaction, playlistInfo);
+                } catch (error) {
+                    stdLog(2, {
+                        extra: '[play]',
+                        err: error,
+                    });
                 }
             }
         } else {

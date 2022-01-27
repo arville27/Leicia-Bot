@@ -12,6 +12,9 @@
         "spotifyClientID": <Spotify Client ID>, // required
         "spotifyClientSecret": <Spotify Client Secret>, // required
         "FacebookScrapperAPIKey": "", // private api key, ignore this
+        "subsonicHost": <Subsonic host>, // optional
+        "subsonicUser": <Subsonic user>, // optional
+        "subsonicPassword": <Subsonic password>, // optional
         "prefix": "!", // prefix for chat command
         "mongooseConnectionString": "example --> mongodb://localhost:27017/",
         "mongoUser": "mongodb user",
