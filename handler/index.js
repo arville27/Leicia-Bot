@@ -93,12 +93,13 @@ module.exports = async (client) => {
     });
 
     // subsonic
-    client.subsonic
+    if (client.subsonic){
+        client.subsonic
         .pingServer()
         .then((res) => {
             if (res.status === 'ok')
                 stdLog(0, { extra: 'Successfully connected to SubsonicAPI Server' });
-            else {
+                else {
                 stdLog(1, { extra: 'Failed to connected to SubsonicAPI Server' });
                 client.subsonic = undefined;
             }
@@ -106,8 +107,9 @@ module.exports = async (client) => {
         .catch(() => {
             client.subsonic = undefined;
         });
-
-    // mongoose
+    }
+        
+        // mongoose
     if (!mongooseConnectionString) return;
 
     const auth = {
