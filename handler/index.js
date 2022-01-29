@@ -11,6 +11,13 @@ const globPromise = promisify(glob);
  * @param {Client} client
  */
 module.exports = async (client) => {
+    // Custom words
+    const wordsFiles = await globPromise(`${process.cwd()}/words/*.js`);
+    wordsFiles.forEach((value) => {
+        const file = require(value);
+        if (file.matcher) client.words.push(file);
+    });
+
     // Commands
     const commandFiles = await globPromise(`${process.cwd()}/commands/**/*.js`);
     commandFiles.map((value) => {
@@ -93,23 +100,23 @@ module.exports = async (client) => {
     });
 
     // subsonic
-    if (client.subsonic){
+    if (client.subsonic) {
         client.subsonic
-        .pingServer()
-        .then((res) => {
-            if (res.status === 'ok')
-                stdLog(0, { extra: 'Successfully connected to SubsonicAPI Server' });
+            .pingServer()
+            .then((res) => {
+                if (res.status === 'ok')
+                    stdLog(0, { extra: 'Successfully connected to SubsonicAPI Server' });
                 else {
-                stdLog(1, { extra: 'Failed to connected to SubsonicAPI Server' });
+                    stdLog(1, { extra: 'Failed to connected to SubsonicAPI Server' });
+                    client.subsonic = undefined;
+                }
+            })
+            .catch(() => {
                 client.subsonic = undefined;
-            }
-        })
-        .catch(() => {
-            client.subsonic = undefined;
-        });
+            });
     }
-        
-        // mongoose
+
+    // mongoose
     if (!mongooseConnectionString) return;
 
     const auth = {

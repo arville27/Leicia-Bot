@@ -11,9 +11,10 @@ const client = new Client({
 module.exports = client;
 
 // Global Variables
+client.config = require('./config.json');
+client.words = new Array();
 client.commands = new Collection();
 client.slashCommands = new Collection();
-client.config = require('./config.json');
 client.subscriptions = new Map();
 client.discordTogether = new DiscordTogether(client);
 
