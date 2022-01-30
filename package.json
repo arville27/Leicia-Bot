@@ -1,14 +1,14 @@
 {
-    "name": "djs",
+    "name": "discord-leicia",
     "version": "1.0.0",
-    "description": "",
+    "description": "Discord bot",
     "main": "index.js",
     "scripts": {
         "start": "node index.js",
         "test": "nodemon index.js"
     },
     "keywords": [],
-    "author": "",
+    "author": "Daniel Wijaya",
     "license": "ISC",
     "dependencies": {
         "@discordjs/builders": "^0.6.0",
