@@ -19,7 +19,7 @@ client.on('interactionCreate', async (interaction) => {
         }
         interaction.member = interaction.guild.members.cache.get(interaction.user.id);
 
-        stdLog(0, { interaction, cmd, args });
+        stdLog(0, { interaction: interaction, extra: `SlashCommandName: ${cmd.name}, ${args}` });
 
         if (!interaction.member.permissions.has(cmd.userPermissions || []))
             return await reply(interaction, embedResponse(resp.others.insufficentPerm));
