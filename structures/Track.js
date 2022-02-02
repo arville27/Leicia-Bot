@@ -60,9 +60,9 @@ class Track {
                 {
                     o: '-',
                     q: '',
-                    r: '1M',
-                    'fragment-retries': '100',
-                    'skip-unavailable-fragments': '',
+                    r: '100K',
+                    // 'fragment-retries': '100',
+                    // 'skip-unavailable-fragments': '',
                     f: 'bestaudio[ext=webm+aco/dec=opus+asr=48000]/bestaudio',
                 },
                 { stdio: ['ignore', 'pipe', 'ignore'] }
