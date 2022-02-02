@@ -3,7 +3,7 @@ const { joinVoiceChannel } = require('@discordjs/voice');
 const { getPlaylistInfo, getVideoInfo, search } = require('youtube-scrapper');
 const { MusicSubscription } = require('../structures/MusicSubscription');
 const { TrackMetadata } = require('../structures/TrackMetadata');
-const { embedResponse, reply } = require('../utils/Utility');
+const { embedResponse, reply, stdLog } = require('../utils/Utility');
 
 /**
  *
@@ -79,7 +79,8 @@ const trackInfoMethods = (subscription, interaction, trackMetadata) => {
             );
         },
         onError: (error) => {
-            console.log(error);
+            stdLog(2, { interaction: interaction, err: error });
+            subscription.skip();
         },
     };
 };
