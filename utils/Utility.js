@@ -69,28 +69,22 @@ async function reply(interaction, embed) {
 }
 
 /**
- * @typedef {interaction: CommandInteraction, cmd: Object, args: Array, extra: Object, err: any} logArgs
+ * @typedef {interaction: CommandInteraction, message: Message, extra: Object, err: any} logArgs
  * @param {Number} level 0: INFO, 1: WARN, 2:ERROR
  * @param {logArgs} logArgs
  */
-function stdLog(level, { interaction, cmd, args, extra, err }) {
+function stdLog(level, { interaction, message, extra, err }) {
     let logLevel = 'INFO';
     if (level && level === 1) logLevel = 'WARN';
     else if (level && level === 2) logLevel = 'ERROR';
     let logInformation = `[${new Date().toLocaleString()}][${logLevel}]`;
 
     if (interaction) {
-        logInformation += `[${interaction.guild.name} :: ${interaction.user.tag}]`;
+        logInformation += `[${interaction.guild.name}::${interaction.user.tag}]`;
+    } else if (message) {
+        logInformation += `[${message.guild.name}::${message.author.tag}]`;
     } else {
         logInformation += '[SYSTEM]';
-    }
-
-    if (cmd) {
-        logInformation += ` ${interaction.commandName}`;
-        if (args) logInformation += ` ${args}`;
-        if (!interaction.member.permissions.has(cmd.userPermissions || [])) {
-            logInformation += ` (Insufficent user permission: ${cmd.userPermissions})`;
-        }
     }
 
     if (extra) {
