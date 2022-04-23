@@ -9,9 +9,7 @@ module.exports = {
     ...new SlashCommandBuilder()
         .setName('playlist')
         .setDescription("List of user's playlist")
-        .addStringOption((input) =>
-            input.setName('name').setDescription('Playlist name to see details')
-        ),
+        .addStringOption((input) => input.setName('name').setDescription('Playlist name to see details')),
     /**
      *
      * @param {Client} client
@@ -58,7 +56,10 @@ module.exports = {
             pages = playlistNames.map((playlistInfo) => {
                 return new MessageEmbed()
                     .setColor('#93C5F7')
-                    .setAuthor(`${interaction.user.username}'s`, interaction.user.avatarURL())
+                    .setAuthor({
+                        name: `${interaction.user.username}'s`,
+                        iconURL: interaction.user.avatarURL(),
+                    })
                     .setTitle(`Saved Playlists (${playlists.length} playlists)`)
                     .setDescription(playlistInfo);
             });
@@ -86,10 +87,11 @@ module.exports = {
             pages = tracksInfos.map((tracksInfo) => {
                 return new MessageEmbed()
                     .setColor('#93C5F7')
-                    .setAuthor(`${interaction.user.username}'s`, interaction.user.avatarURL())
-                    .setTitle(
-                        bold(`${truncateString(playlists[0]._id, 30)} (${tracks.length} tracks)`)
-                    )
+                    .setAuthor({
+                        name: `${interaction.user.username}'s`,
+                        iconURL: interaction.user.avatarURL(),
+                    })
+                    .setTitle(bold(`${truncateString(playlists[0]._id, 30)} (${tracks.length} tracks)`))
                     .setDescription(tracksInfo);
             });
         }

@@ -14,7 +14,10 @@ function singleTrackEmbed(interaction, trackMetadata, trackPosition) {
         .setColor('#c99fff')
         .setTitle(trackMetadata.title)
         .setURL(trackMetadata.url)
-        .setAuthor('Added to queue', interaction.user.avatarURL())
+        .setAuthor({
+            name: 'Added to queue',
+            iconURL: interaction.user.avatarURL(),
+        })
         .setThumbnail(trackMetadata.thumbnail)
         .addFields(
             {
@@ -40,7 +43,10 @@ function playlistEmbed(interaction, playlistInfo) {
     const embed = new MessageEmbed()
         .setColor('#c99fff')
         .setTitle(playlistInfo.playlistName)
-        .setAuthor('Playlist added to queue', interaction.user.avatarURL())
+        .setAuthor({
+            name: 'Playlist added to queue',
+            iconURL: interaction.user.avatarURL(),
+        })
         .addFields({
             name: 'Added to queue',
             value: `${playlistInfo.count}`,
@@ -84,9 +90,7 @@ function toggleAnnounce(state) {
 function unpauseAudioPlayer(state) {
     return state
         ? new MessageEmbed().setDescription(':arrow_forward: **Unpaused!**').setColor('#00eb55')
-        : new MessageEmbed()
-              .setDescription(':arrow_forward: **Already playing!**')
-              .setColor('#00eb55');
+        : new MessageEmbed().setDescription(':arrow_forward: **Already playing!**').setColor('#00eb55');
 }
 
 /**

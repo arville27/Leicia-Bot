@@ -52,7 +52,7 @@ const trackInfoMethods = (subscription, interaction, trackMetadata) => {
                 .setColor('#00eb55')
                 .setTitle(trackMetadata.title)
                 .setURL(trackMetadata.url)
-                .setAuthor('Now playing', interaction.user.avatarURL())
+                .setAuthor({ name: 'Now playing', iconURL: interaction.user.avatarURL() })
                 .setThumbnail(trackMetadata.thumbnail)
                 .addFields(
                     {
