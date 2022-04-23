@@ -3,6 +3,7 @@ const { DiscordTogether } = require('discord-together');
 const { HealthCheckServer } = require('./healthcheckserver');
 const { stdLog } = require('./utils/Utility');
 const { SubsonicAPI } = require('./utils/SubsonicAPI');
+const process = require('process');
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
@@ -38,4 +39,4 @@ require('./handler')(client);
 
 new HealthCheckServer(3090, client).start();
 
-client.login(client.config.token);
+client.login(process.env.BOT_TOKEN || client.config.token);

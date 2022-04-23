@@ -13,6 +13,7 @@ services:
             - MONGO_HOST=${MONGO_HOST}
             - MONGO_USER=${MONGO_ROOT_USER}
             - MONGO_PASS=${MONGO_ROOT_PASSWORD}
+            - BOT_TOKEN=${BOT_TOKEN}
         restart: always
         depends_on:
             - mongo
