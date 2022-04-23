@@ -24,13 +24,15 @@ if (client.config.subsonicHost && client.config.subsonicUser && client.config.su
         client.config.subsonicUser,
         client.config.subsonicPassword
     );
-if (!client.config.token) return stdLog(2, { extra: 'Missing discord bot token' });
-if (!client.config.guildsId) return stdLog(2, { extra: 'Please provide at least one guild id' });
+
+if (!client.config.token) stdLog(2, { extra: 'Missing discord bot token' });
+if (!client.config.guildsId) stdLog(2, { extra: 'Please provide at least one guild id' });
 if (Object.values(client.config.guildsId).length == 0)
-    return stdLog(2, { extra: 'Check if guildId in config.json, ensure it is in correct format' });
-if (!client.config.prefix) return stdLog(2, { extra: 'Please provide a chat command prefix' });
+    stdLog(2, { extra: 'Check if guildId in config.json, ensure it is in correct format' });
+if (!client.config.prefix) stdLog(2, { extra: 'Please provide a chat command prefix' });
 if (!client.config.spotifyClientID || !client.config.spotifyClientSecret)
-    return stdLog(2, { extra: 'Please provide a Spotify ClientID and Client Secret' });
+    stdLog(2, { extra: 'Please provide a Spotify ClientID and Client Secret' });
+
 // Initializing the project
 require('./handler')(client);
 
