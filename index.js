@@ -36,6 +36,6 @@ if (!client.config.spotifyClientID || !client.config.spotifyClientSecret)
 // Initializing the project
 require('./handler')(client);
 
-new HealthCheckServer(3090).start();
+new HealthCheckServer(3090, client).start();
 
 client.login(client.config.token);

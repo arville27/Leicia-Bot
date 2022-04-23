@@ -2,7 +2,7 @@ const http = require('http');
 const { stdLog } = require('./utils/Utility');
 
 class HealthCheckServer {
-    constructor(port) {
+    constructor(port, client) {
         this.port = port || 3030;
         this.server = http.createServer((req, res) => {
             res.setHeader('Content-Type', 'application/json');
@@ -16,9 +16,14 @@ class HealthCheckServer {
             } else {
                 res.statusCode = 200;
                 if (req.url === '/health') {
-                    res.end(JSON.stringify({ status: 'OK' }));
+                    if (!client.isDatabaseConnected) {
+                        res.statusCode = 500;
+                        res.end(JSON.stringify({ status: 'ERROR', message: 'Cannot connect to database' }));
+                    } else {
+                        res.end(JSON.stringify({ status: 'OK', message: 'Healthy' }));
+                    }
                 } else {
-                    res.statusCode = 405;
+                    res.statusCode = 404;
                     res.end(JSON.stringify({ error: `${http.STATUS_CODES[404]}` }));
                 }
             }
