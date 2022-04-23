@@ -129,8 +129,8 @@ module.exports = async (client) => {
             client.isDatabaseConnected = true;
             stdLog(0, { extra: 'Connected to mongodb' });
         })
-        .catch(() => {
+        .catch((err) => {
             client.isDatabaseConnected = false;
-            stdLog(2, { extra: 'Failed to connect to mongodb' });
+            stdLog(2, { extra: 'Failed to connect to mongodb', err: err });
         });
 };
