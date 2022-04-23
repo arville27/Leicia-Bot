@@ -1,6 +1,6 @@
 const { MessageButton, MessageActionRow, CommandInteraction } = require('discord.js');
 const resp = require('../responses/MusicCommandsResponse');
-const { embedResponse, stdLog } = require('../utils/Utility');
+const { embedResponse } = require('../utils/Utility');
 const { promisify } = require('util');
 const { bold } = require('@discordjs/builders');
 const wait = promisify(setTimeout);

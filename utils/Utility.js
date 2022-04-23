@@ -1,4 +1,4 @@
-const { MessageEmbed, CommandInteraction, Message } = require('discord.js');
+const { MessageEmbed, CommandInteraction } = require('discord.js');
 
 const urlRegex = /([a-z]+:\/\/)(?:([a-z0-9]+)\.)?([a-z0-9]+)\.([a-z]{2,})/;
 /**
