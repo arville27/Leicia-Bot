@@ -2,7 +2,7 @@ const { glob } = require('glob');
 const { promisify } = require('util');
 const { Client } = require('discord.js');
 const mongoose = require('mongoose');
-const { mongooseConnectionString, mongoUser, mongoPass, guildsId } = require('../config.json');
+const { mongooseConnectionString, mongoUser, mongoPass, guildsId } = require('../index').config;
 const { stdLog } = require('../utils/Utility');
 
 const globPromise = promisify(glob);
@@ -104,8 +104,7 @@ module.exports = async (client) => {
         client.subsonic
             .pingServer()
             .then((res) => {
-                if (res.status === 'ok')
-                    stdLog(0, { extra: 'Successfully connected to SubsonicAPI Server' });
+                if (res.status === 'ok') stdLog(0, { extra: 'Successfully connected to SubsonicAPI Server' });
                 else {
                     stdLog(1, { extra: 'Failed to connected to SubsonicAPI Server' });
                     client.subsonic = undefined;

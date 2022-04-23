@@ -1,5 +1,5 @@
 const axios = require('axios').default;
-const { FacebookScrapperAPIKey } = require('../config.json');
+const { FacebookScrapperAPIKey } = require('../index').config;
 
 async function getPostData(url) {
     const PAYLOAD = {

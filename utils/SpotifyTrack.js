@@ -1,4 +1,4 @@
-const { spotifyClientID, spotifyClientSecret } = require('../config.json');
+const { spotifyClientID, spotifyClientSecret } = require('../index').config;
 const { Spotify } = require('spotify-info.js');
 const { trackMetadataFrom } = require('../utils/MusicCommands').mc;
 const spotify = new Spotify({
