@@ -28,14 +28,13 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
     }
 
     const curPage = await interaction.editReply({
-        embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+        embeds: [pages[page].setFooter({ text: `Page ${page + 1} / ${pages.length}` })],
         components: [row],
         fetchReply: true,
     });
 
     const filter = (i) => {
-        const validId =
-            i.customId === buttonList[0].customId || i.customId === buttonList[1].customId;
+        const validId = i.customId === buttonList[0].customId || i.customId === buttonList[1].customId;
         if (validId && i.user === interaction.user) return true;
         else if (validId) {
             i.channel
@@ -67,7 +66,7 @@ const paginationEmbed = async (interaction, pages, buttonList, timeout = 60_000)
         }
         await i.deferUpdate();
         await i.editReply({
-            embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+            embeds: [pages[page].setFooter({ text: `Page ${page + 1} / ${pages.length}` })],
             components: [row],
         });
         collector.resetTimer();
