@@ -4,6 +4,7 @@ const { Client } = require('discord.js');
 const mongoose = require('mongoose');
 const { mongooseConnectionString, mongoUser, mongoPass, guildsId } = require('../index').config;
 const { stdLog } = require('../utils/Utility');
+const process = require('process');
 
 const globPromise = promisify(glob);
 
@@ -120,11 +121,14 @@ module.exports = async (client) => {
 
     const auth = {
         authSource: 'admin',
-        user: mongoUser,
-        pass: mongoPass,
+        user: process.env.MONGO_USER || mongoUser,
+        pass: process.env.MONGO_PASS || mongoPass,
     };
+
+    const connString = new URL(mongooseConnectionString);
+    if (process.env.MONGO_HOST) connString.hostname = process.env.MONGO_HOST;
     mongoose
-        .connect(mongooseConnectionString, auth)
+        .connect(connString.toString(), auth)
         .then(() => {
             client.isDatabaseConnected = true;
             stdLog(0, { extra: 'Connected to mongodb' });
